@@ -831,20 +831,7 @@ function Dashboard({ admin, onLogout }) {
             Global<span style={{ color: "#06b6d4" }}>Tropical</span>
             <span style={{ color: "#f59e0b" }}>Cargos</span>
           </strong>
-          {offline && (
-            <span
-              style={{
-                background: "#f59e0b",
-                color: "#fff",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                padding: "2px 8px",
-                borderRadius: "20px",
-              }}
-            >
-              OFFLINE
-            </span>
-          )}
+
         </div>
 
         <div className="admin-header-user">
