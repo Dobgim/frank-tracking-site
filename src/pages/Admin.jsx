@@ -301,7 +301,6 @@ function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
         onCreated(local);
         setSubmitting(false);
         onClose();
-        onError("Saved locally on this device (" + (result.error || "cloud unreachable") + "). It will auto-sync to Cloud once connected.");
       } catch (err) {
         onError(err.message);
         setSubmitting(false);
@@ -885,6 +884,11 @@ function Dashboard({ admin, onLogout }) {
     setTimeout(() => setNotice(null), 4000);
   };
 
+  const showError = (msg) => {
+    setError(msg);
+    if (msg) setTimeout(() => setError(null), 5000);
+  };
+
   const logout = async () => {
     await tryApi("/logout", { method: "POST" }).catch(() => {});
     clearLocalSession();
@@ -937,7 +941,37 @@ function Dashboard({ admin, onLogout }) {
 
       <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "24px 16px" }}>
         {/* Top Alerts */}
-        {error && <div className="admin-error"><i className="bi bi-exclamation-triangle-fill"></i> {error}</div>}
+        {error && (
+          <div
+            className="admin-error"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}
+          >
+            <span>
+              <i className="bi bi-exclamation-triangle-fill"></i> {error}
+            </span>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              style={{
+                background: "none",
+                border: 0,
+                color: "inherit",
+                cursor: "pointer",
+                fontSize: "1.2rem",
+                padding: "0 6px",
+                lineHeight: 1,
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+        )}
         {notice && (
           <div className="admin-success-banner" style={{ background: "#064e3b", borderColor: "#059669", color: "#a7f3d0" }}>
             <i className="bi bi-check-circle-fill"></i> {notice}
@@ -1109,7 +1143,7 @@ function Dashboard({ admin, onLogout }) {
                 key={s.id}
                 shipment={s}
                 onChange={refresh}
-                onError={setError}
+                onError={showError}
                 onCopied={showNotification}
               />
             ))}
@@ -1126,7 +1160,7 @@ function Dashboard({ admin, onLogout }) {
           showNotification(`Shipment ${newShipment.code} successfully created!`);
           refresh();
         }}
-        onError={setError}
+        onError={showError}
       />
     </div>
   );
