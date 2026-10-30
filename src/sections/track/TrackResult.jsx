@@ -120,7 +120,7 @@ export default function TrackResult({ code }) {
     let active = true;
     const load = async () => {
       try {
-        const response = await fetch(`/api/track/${encodeURIComponent(code)}`, {
+        const response = await fetch(`/api/track?code=${encodeURIComponent(code)}`, {
           signal: AbortSignal.timeout(15000),
         });
         const contentType = response.headers.get("content-type") || "";

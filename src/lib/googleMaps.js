@@ -7,7 +7,9 @@ export function loadGoogleMaps() {
   if (loading) return loading;
 
   loading = new Promise((resolve, reject) => {
-    const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const key =
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
+      "AIzaSyBpxYpVUtQlXjQgBCJNDvLkADlgTQ9IbLs";
     if (!key) {
       reject(new Error("The Google Maps API key is not set."));
       return;
