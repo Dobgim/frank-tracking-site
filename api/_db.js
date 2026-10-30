@@ -26,72 +26,84 @@ export async function ensureSchema(sql) {
   if (schemaPromise) return schemaPromise;
 
   schemaPromise = (async () => {
-    // Run schema creation in single multi-statement query to reduce round-trips to Neon
-    await sql`
-      CREATE TABLE IF NOT EXISTS admins (
-        id SERIAL PRIMARY KEY,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS sessions (
-        token_hash TEXT PRIMARY KEY,
-        admin_id INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
-        expires_at BIGINT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS shipments (
-        id SERIAL PRIMARY KEY,
-        code TEXT NOT NULL UNIQUE,
-        description TEXT NOT NULL DEFAULT '',
-        origin_name TEXT NOT NULL,
-        origin_lat REAL NOT NULL,
-        origin_lng REAL NOT NULL,
-        dest_name TEXT NOT NULL,
-        dest_lat REAL NOT NULL,
-        dest_lng REAL NOT NULL,
-        distance_km REAL NOT NULL,
-        speed_kmh REAL NOT NULL DEFAULT 900,
-        status TEXT NOT NULL DEFAULT 'pending',
-        covered_km REAL NOT NULL DEFAULT 0,
-        settled_at BIGINT NOT NULL,
-        created_at BIGINT NOT NULL,
-        shipment_type TEXT DEFAULT 'Air Freight',
-        sender_name TEXT DEFAULT '',
-        receiver_name TEXT DEFAULT '',
-        sender_email TEXT DEFAULT '',
-        receiver_email TEXT DEFAULT '',
-        sender_number TEXT DEFAULT '',
-        receiver_number TEXT DEFAULT '',
-        sender_address TEXT DEFAULT '',
-        receiver_address TEXT DEFAULT '',
-        weight_kg REAL DEFAULT 0,
-        ship_date TEXT DEFAULT '',
-        expected_delivery_date TEXT DEFAULT '',
-        expected_delivery_time TEXT DEFAULT '',
-        piece_type TEXT DEFAULT 'Carton'
-      );
-      CREATE TABLE IF NOT EXISTS shipment_events (
-        id SERIAL PRIMARY KEY,
-        shipment_id INTEGER NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
-        status TEXT NOT NULL,
-        covered_km REAL NOT NULL,
-        created_at BIGINT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS messages (
-        id SERIAL PRIMARY KEY,
-        payload TEXT NOT NULL,
-        created_at BIGINT NOT NULL
-      );
-    `;
+    try {
+      await sql`
+        CREATE TABLE IF NOT EXISTS admins (
+          id SERIAL PRIMARY KEY,
+          email TEXT NOT NULL UNIQUE,
+          password_hash TEXT NOT NULL
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS sessions (
+          token_hash TEXT PRIMARY KEY,
+          admin_id INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
+          expires_at BIGINT NOT NULL
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS shipments (
+          id SERIAL PRIMARY KEY,
+          code TEXT NOT NULL UNIQUE,
+          description TEXT NOT NULL DEFAULT '',
+          origin_name TEXT NOT NULL,
+          origin_lat REAL NOT NULL,
+          origin_lng REAL NOT NULL,
+          dest_name TEXT NOT NULL,
+          dest_lat REAL NOT NULL,
+          dest_lng REAL NOT NULL,
+          distance_km REAL NOT NULL,
+          speed_kmh REAL NOT NULL DEFAULT 900,
+          status TEXT NOT NULL DEFAULT 'pending',
+          covered_km REAL NOT NULL DEFAULT 0,
+          settled_at BIGINT NOT NULL,
+          created_at BIGINT NOT NULL,
+          shipment_type TEXT DEFAULT 'Air Freight',
+          sender_name TEXT DEFAULT '',
+          receiver_name TEXT DEFAULT '',
+          sender_email TEXT DEFAULT '',
+          receiver_email TEXT DEFAULT '',
+          sender_number TEXT DEFAULT '',
+          receiver_number TEXT DEFAULT '',
+          sender_address TEXT DEFAULT '',
+          receiver_address TEXT DEFAULT '',
+          weight_kg REAL DEFAULT 0,
+          ship_date TEXT DEFAULT '',
+          expected_delivery_date TEXT DEFAULT '',
+          expected_delivery_time TEXT DEFAULT '',
+          piece_type TEXT DEFAULT 'Carton'
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS shipment_events (
+          id SERIAL PRIMARY KEY,
+          shipment_id INTEGER NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+          status TEXT NOT NULL,
+          covered_km REAL NOT NULL,
+          created_at BIGINT NOT NULL
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS messages (
+          id SERIAL PRIMARY KEY,
+          payload TEXT NOT NULL,
+          created_at BIGINT NOT NULL
+        )
+      `;
 
-    // Seed default admin if no admins exist
-    const admins = await sql`SELECT COUNT(*) as cnt FROM admins`;
-    if (Number(admins[0].cnt) === 0) {
-      const email = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
-      const password = process.env.ADMIN_PASSWORD || "globaladmin123";
-      await sql`INSERT INTO admins (email, password_hash) VALUES (${email}, ${hashPassword(password)})`;
+      // Seed default admin if no admins exist
+      const admins = await sql`SELECT COUNT(*) as cnt FROM admins`;
+      if (Number(admins[0].cnt) === 0) {
+        const email = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
+        const password = process.env.ADMIN_PASSWORD || "globaladmin123";
+        await sql`INSERT INTO admins (email, password_hash) VALUES (${email}, ${hashPassword(password)})`;
+      }
+
+      schemaEnsured = true;
+    } catch (err) {
+      schemaPromise = null;
+      throw err;
     }
-
-    schemaEnsured = true;
   })();
 
   return schemaPromise;
