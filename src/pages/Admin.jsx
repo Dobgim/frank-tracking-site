@@ -85,27 +85,60 @@ const ADMIN_CREDENTIALS = {
   "admin@demofreight.test": "globaladmin123",
 };
 
+const TOKEN_KEY = "gtc_admin_bearer_token";
+
+export function getAdminToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+export function setAdminToken(token) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {}
+}
+
 // ─── API Helper ───────────────────────────────────────────────────────────────
 async function tryApi(path, options = {}) {
   try {
+    const token = getAdminToken();
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    };
+
     const response = await fetch(`/api/admin${path}`, {
       ...options,
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers,
       body: options.body && JSON.stringify(options.body),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
     });
+
     if (response.status === 404 || response.status === 502 || response.status === 503) {
-      return { ok: false, offline: true };
+      return { ok: false, offline: true, status: response.status };
     }
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
-      return { ok: false, offline: true };
+      return { ok: false, offline: true, error: "Non-JSON response from server.", status: response.status };
     }
     const data = await response.json();
-    if (!response.ok) throw Object.assign(new Error(data.error || "Server error"), { status: response.status });
+    if (!response.ok) {
+      return { ok: false, error: data.error || "Server error", status: response.status };
+    }
     return { ok: true, data };
   } catch (err) {
-    return { ok: false, offline: true, error: err.message, status: err.status };
+    return {
+      ok: false,
+      offline: true,
+      error: err.name === "TimeoutError" ? "Request timed out after 15 seconds." : err.message,
+      status: err.status,
+    };
   }
 }
 
@@ -123,6 +156,9 @@ function Login({ onLogin }) {
 
     const result = await tryApi("/login", { method: "POST", body: { email, password } });
     if (result.ok) {
+      if (result.data.token) {
+        setAdminToken(result.data.token);
+      }
       onLogin(result.data);
       setLoading(false);
       return;
@@ -251,13 +287,21 @@ function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
       return;
     }
 
-    // 2. Offline fallback
+    // 2. If server returned an error (e.g. 409 tracking code duplicate or 401 unauth)
+    if (result.error && !result.offline) {
+      onError(result.error);
+      setSubmitting(false);
+      return;
+    }
+
+    // 3. Offline fallback
     if (result.offline) {
       try {
         const local = createLocalShipment(payload);
         onCreated(local);
         setSubmitting(false);
         onClose();
+        onError("Saved locally on this device (" + (result.error || "cloud unreachable") + "). It will auto-sync to Cloud once connected.");
       } catch (err) {
         onError(err.message);
         setSubmitting(false);
@@ -774,6 +818,49 @@ function Dashboard({ admin, onLogout }) {
       setShipments(shipRes.data);
       setMessages(msgRes.data);
       setOffline(false);
+
+      // Auto-sync any local shipments created earlier while offline to Neon Postgres
+      const localList = getLocalShipments();
+      if (localList.length > 0) {
+        for (const item of localList) {
+          const exists = shipRes.data.some((s) => s.code?.toUpperCase() === item.code?.toUpperCase());
+          if (!exists) {
+            tryApi("/shipments", {
+              method: "POST",
+              body: {
+                code: item.code,
+                description: item.description,
+                originName: item.origin?.name || item.originName,
+                destinationName: item.destination?.name || item.destinationName,
+                speedKmh: item.speedKmh,
+                status: item.status,
+                shipmentType: item.shipmentType,
+                senderName: item.senderName,
+                receiverName: item.receiverName,
+                senderEmail: item.senderEmail,
+                receiverEmail: item.receiverEmail,
+                senderNumber: item.senderNumber,
+                receiverNumber: item.receiverNumber,
+                senderAddress: item.senderAddress,
+                receiverAddress: item.receiverAddress,
+                weightKg: item.weightKg,
+                shipDate: item.shipDate,
+                expectedDeliveryDate: item.expectedDeliveryDate,
+                expectedDeliveryTime: item.expectedDeliveryTime,
+                pieceType: item.pieceType,
+              },
+            }).then((syncRes) => {
+              if (syncRes.ok) {
+                deleteLocalShipment(item.id);
+                setShipments((prev) => [syncRes.data, ...prev.filter((p) => p.code !== syncRes.data.code)]);
+                showNotification(`Synced ${item.code} to Cloud Database!`);
+              }
+            });
+          } else {
+            deleteLocalShipment(item.id);
+          }
+        }
+      }
     } else if (shipRes.offline || msgRes.offline) {
       setShipments(getLocalShipments());
       setMessages(getLocalMessages());
@@ -801,6 +888,7 @@ function Dashboard({ admin, onLogout }) {
   const logout = async () => {
     await tryApi("/logout", { method: "POST" }).catch(() => {});
     clearLocalSession();
+    setAdminToken("");
     onLogout();
   };
 
@@ -1050,6 +1138,7 @@ export default function Admin() {
 
   const logout = useCallback(() => {
     clearLocalSession();
+    setAdminToken("");
     setAdmin(null);
   }, []);
 

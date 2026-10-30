@@ -114,13 +114,14 @@ function ShipmentMap({ shipment }) {
 export default function TrackResult({ code }) {
   const [shipment, setShipment] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     const load = async () => {
       try {
         const response = await fetch(`/api/track/${encodeURIComponent(code)}`, {
-          signal: AbortSignal.timeout(4000),
+          signal: AbortSignal.timeout(15000),
         });
         const contentType = response.headers.get("content-type") || "";
         if (!response.ok || !contentType.includes("application/json")) {
@@ -128,30 +129,43 @@ export default function TrackResult({ code }) {
           if (local) {
             setError(null);
             setShipment(local);
+            setLoading(false);
             return;
           }
+          let errMsg = "No shipment found with that tracking code.";
+          try {
+            const errData = await response.json();
+            if (errData.error) errMsg = errData.error;
+          } catch {}
           setShipment(null);
-          setError("No shipment found with that tracking code.");
+          setError(errMsg);
+          setLoading(false);
           return;
         }
         const data = await response.json();
         if (!active) return;
         setError(null);
         setShipment(data);
-      } catch {
+        setLoading(false);
+      } catch (err) {
         if (!active) return;
-        // Network error — fall back to local storage
         const local = findLocalShipmentByCode(code);
         if (local) {
           setError(null);
           setShipment(local);
         } else {
-          setError("No shipment found with that tracking code.");
+          setError(
+            err.name === "TimeoutError"
+              ? "Connecting to database timed out. Please refresh to retry."
+              : "No shipment found with that tracking code."
+          );
         }
+        setLoading(false);
       }
     };
     setShipment(null);
     setError(null);
+    setLoading(true);
     load();
     const timer = setInterval(load, POLL_MS);
     return () => {
@@ -159,6 +173,23 @@ export default function TrackResult({ code }) {
       clearInterval(timer);
     };
   }, [code]);
+
+  if (loading && !shipment && !error) {
+    return (
+      <section className="container py-5 text-center">
+        <div
+          className="spinner-border mb-3"
+          role="status"
+          style={{ width: "2.8rem", height: "2.8rem", color: "#1abc9c", borderWidth: "3px" }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p style={{ color: "#64748b", fontWeight: 500, fontSize: "1.05rem" }}>
+          Searching for shipment <strong>{code}</strong>...
+        </p>
+      </section>
+    );
+  }
 
   if (error) {
     return (

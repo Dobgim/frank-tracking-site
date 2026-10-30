@@ -1,86 +1,100 @@
 // Shared Neon Postgres client + helpers for all API routes
 import { neon } from "@neondatabase/serverless";
+import { hashPassword } from "./auth-helper.js";
 
 export function getDb() {
-  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-  if (!url) throw new Error("DATABASE_URL env variable is not set.");
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.NEON_DATABASE_URL;
+  if (!url) {
+    throw new Error(
+      "Database connection string missing. Please ensure DATABASE_URL or POSTGRES_URL is configured in Vercel project environment variables."
+    );
+  }
   return neon(url);
 }
 
-// ── Schema bootstrap (runs on every cold start, safe to call repeatedly) ──────
-export async function ensureSchema(sql) {
-  await sql`
-    CREATE TABLE IF NOT EXISTS admins (
-      id SERIAL PRIMARY KEY,
-      email TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS sessions (
-      token_hash TEXT PRIMARY KEY,
-      admin_id INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
-      expires_at BIGINT NOT NULL
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS shipments (
-      id SERIAL PRIMARY KEY,
-      code TEXT NOT NULL UNIQUE,
-      description TEXT NOT NULL DEFAULT '',
-      origin_name TEXT NOT NULL,
-      origin_lat REAL NOT NULL,
-      origin_lng REAL NOT NULL,
-      dest_name TEXT NOT NULL,
-      dest_lat REAL NOT NULL,
-      dest_lng REAL NOT NULL,
-      distance_km REAL NOT NULL,
-      speed_kmh REAL NOT NULL DEFAULT 900,
-      status TEXT NOT NULL DEFAULT 'pending',
-      covered_km REAL NOT NULL DEFAULT 0,
-      settled_at BIGINT NOT NULL,
-      created_at BIGINT NOT NULL,
-      shipment_type TEXT DEFAULT 'Air Freight',
-      sender_name TEXT DEFAULT '',
-      receiver_name TEXT DEFAULT '',
-      sender_email TEXT DEFAULT '',
-      receiver_email TEXT DEFAULT '',
-      sender_number TEXT DEFAULT '',
-      receiver_number TEXT DEFAULT '',
-      sender_address TEXT DEFAULT '',
-      receiver_address TEXT DEFAULT '',
-      weight_kg REAL DEFAULT 0,
-      ship_date TEXT DEFAULT '',
-      expected_delivery_date TEXT DEFAULT '',
-      expected_delivery_time TEXT DEFAULT '',
-      piece_type TEXT DEFAULT 'Carton'
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS shipment_events (
-      id SERIAL PRIMARY KEY,
-      shipment_id INTEGER NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
-      status TEXT NOT NULL,
-      covered_km REAL NOT NULL,
-      created_at BIGINT NOT NULL
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS messages (
-      id SERIAL PRIMARY KEY,
-      payload TEXT NOT NULL,
-      created_at BIGINT NOT NULL
-    )
-  `;
+// ── Schema bootstrap (cached in memory across cold starts) ──────────────────────
+let schemaEnsured = false;
+let schemaPromise = null;
 
-  // Seed default admin if no admins exist
-  const admins = await sql`SELECT COUNT(*) as cnt FROM admins`;
-  if (Number(admins[0].cnt) === 0) {
-    const { hashPassword } = await import("./auth-helper.js");
-    const email = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
-    const password = process.env.ADMIN_PASSWORD || "globaladmin123";
-    await sql`INSERT INTO admins (email, password_hash) VALUES (${email}, ${hashPassword(password)})`;
-  }
+export async function ensureSchema(sql) {
+  if (schemaEnsured) return;
+  if (schemaPromise) return schemaPromise;
+
+  schemaPromise = (async () => {
+    // Run schema creation in single multi-statement query to reduce round-trips to Neon
+    await sql`
+      CREATE TABLE IF NOT EXISTS admins (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS sessions (
+        token_hash TEXT PRIMARY KEY,
+        admin_id INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
+        expires_at BIGINT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS shipments (
+        id SERIAL PRIMARY KEY,
+        code TEXT NOT NULL UNIQUE,
+        description TEXT NOT NULL DEFAULT '',
+        origin_name TEXT NOT NULL,
+        origin_lat REAL NOT NULL,
+        origin_lng REAL NOT NULL,
+        dest_name TEXT NOT NULL,
+        dest_lat REAL NOT NULL,
+        dest_lng REAL NOT NULL,
+        distance_km REAL NOT NULL,
+        speed_kmh REAL NOT NULL DEFAULT 900,
+        status TEXT NOT NULL DEFAULT 'pending',
+        covered_km REAL NOT NULL DEFAULT 0,
+        settled_at BIGINT NOT NULL,
+        created_at BIGINT NOT NULL,
+        shipment_type TEXT DEFAULT 'Air Freight',
+        sender_name TEXT DEFAULT '',
+        receiver_name TEXT DEFAULT '',
+        sender_email TEXT DEFAULT '',
+        receiver_email TEXT DEFAULT '',
+        sender_number TEXT DEFAULT '',
+        receiver_number TEXT DEFAULT '',
+        sender_address TEXT DEFAULT '',
+        receiver_address TEXT DEFAULT '',
+        weight_kg REAL DEFAULT 0,
+        ship_date TEXT DEFAULT '',
+        expected_delivery_date TEXT DEFAULT '',
+        expected_delivery_time TEXT DEFAULT '',
+        piece_type TEXT DEFAULT 'Carton'
+      );
+      CREATE TABLE IF NOT EXISTS shipment_events (
+        id SERIAL PRIMARY KEY,
+        shipment_id INTEGER NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
+        status TEXT NOT NULL,
+        covered_km REAL NOT NULL,
+        created_at BIGINT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        payload TEXT NOT NULL,
+        created_at BIGINT NOT NULL
+      );
+    `;
+
+    // Seed default admin if no admins exist
+    const admins = await sql`SELECT COUNT(*) as cnt FROM admins`;
+    if (Number(admins[0].cnt) === 0) {
+      const email = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
+      const password = process.env.ADMIN_PASSWORD || "globaladmin123";
+      await sql`INSERT INTO admins (email, password_hash) VALUES (${email}, ${hashPassword(password)})`;
+    }
+
+    schemaEnsured = true;
+  })();
+
+  return schemaPromise;
 }
 
 // ── Distance helper ────────────────────────────────────────────────────────────
@@ -153,7 +167,7 @@ export function setCors(res) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-admin-token");
 }
 
 export function json(res, status, data) {
@@ -162,6 +176,7 @@ export function json(res, status, data) {
 }
 
 export async function readBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
   return new Promise((resolve) => {
     let body = "";
     req.on("data", (chunk) => (body += chunk));

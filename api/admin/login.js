@@ -3,8 +3,8 @@ import { getDb, ensureSchema, json, setCors, setCookie, readBody } from "../../_
 import { verifyPassword, tokenHash } from "../../auth-helper.js";
 import { randomBytes } from "node:crypto";
 
-const SESSION_MS = 8 * 3_600_000;
-const MAX_ATTEMPTS = 10;
+const SESSION_MS = 30 * 24 * 3_600_000; // 30 days so admin never gets randomly logged out
+const MAX_ATTEMPTS = 15;
 const WINDOW_MS = 15 * 60_000;
 const attempts = new Map();
 
@@ -47,9 +47,9 @@ export default async function handler(req, res) {
     `;
 
     setCookie(res, token, SESSION_MS);
-    return json(res, 200, { email: admin.email });
+    return json(res, 200, { email: admin.email, token });
   } catch (err) {
     console.error(err);
-    return json(res, 500, { error: "Server error." });
+    return json(res, 500, { error: err.message || "Database connection error." });
   }
 }
