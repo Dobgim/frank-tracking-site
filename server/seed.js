@@ -3,7 +3,7 @@ import { hashPassword } from "./auth.js";
 import { CITIES, createShipment, updateShipment } from "./shipments.js";
 
 const EMAIL = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
-const password = process.env.ADMIN_PASSWORD || "admin123";
+const password = process.env.ADMIN_PASSWORD || "globaladmin123";
 
 // Set default admin credentials
 db.prepare("DELETE FROM admins").run();

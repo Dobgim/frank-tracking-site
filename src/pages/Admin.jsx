@@ -81,8 +81,8 @@ const getInitialForm = () => ({
 
 // ─── Offline Credentials Fallback ─────────────────────────────────────────────
 const ADMIN_CREDENTIALS = {
-  "admin@globaltropicalcargos.com": "admin123",
-  "admin@demofreight.test": "admin123",
+  "admin@globaltropicalcargos.com": "globaladmin123",
+  "admin@demofreight.test": "globaladmin123",
 };
 
 // ─── API Helper ───────────────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ function Login({ onLogin }) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@globaltropicalcargos.com"
+            placeholder=""
             required
             autoFocus
           />
