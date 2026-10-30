@@ -16,24 +16,24 @@ export default function Certifications() {
         </div>
         <div className="cert-row" data-aos="fade-up" data-aos-delay="100">
           <div className="cert-badge">
-            <i className="bi bi-award-fill"></i> <span>IATA Certified</span>
+            <i className="bi bi-award-fill"></i> <span>Sample Badge A</span>
           </div>
           <div className="cert-badge">
             <i className="bi bi-patch-check-fill" style={{ color: "var(--green)" }}></i>{" "}
-            <span>ISO 9001:2015</span>
+            <span>Sample Badge B</span>
           </div>
           <div className="cert-badge">
-            <i className="bi bi-truck" style={{ color: "var(--orange)" }}></i> <span>FIATA Member</span>
+            <i className="bi bi-truck" style={{ color: "var(--orange)" }}></i> <span>Sample Badge B</span>
           </div>
           <div className="cert-badge">
-            <i className="bi bi-globe-americas" style={{ color: "#2980b9" }}></i> <span>WCA Partner</span>
+            <i className="bi bi-globe-americas" style={{ color: "#2980b9" }}></i> <span>Sample Badge C</span>
           </div>
           <div className="cert-badge">
-            <i className="bi bi-lock-fill" style={{ color: "var(--blue)" }}></i> <span>AEO Approved</span>
+            <i className="bi bi-lock-fill" style={{ color: "var(--blue)" }}></i> <span>Sample Badge D</span>
           </div>
           <div className="cert-badge">
             <i className="bi bi-clipboard2-check-fill" style={{ color: "#8e44ad" }}></i>{" "}
-            <span>C-TPAT Certified</span>
+            <span>Sample Badge E</span>
           </div>
         </div>
       </div>

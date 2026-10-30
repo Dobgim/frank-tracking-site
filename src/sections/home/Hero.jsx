@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { handleTrackSubmit } from "../../lib/forms";
+import { useTrackSubmit } from "../../lib/forms";
 
 export default function Hero() {
+  const handleTrackSubmit = useTrackSubmit();
   return (
     <section id="hero">
       <div className="hero-circles">
@@ -22,7 +23,7 @@ export default function Hero() {
               Every Horizon
             </h1>
             <p className="hero-subtitle fade-up delay-2">
-              Global Tropical Cargo delivers world-class freight, shipping and supply chain solutions across
+              Demo Freight Co. delivers world-class freight, shipping and supply chain solutions across
               North America, Europe, Asia and beyond — with precision and speed.
             </p>
             <div className="hero-address fade-up delay-2">
@@ -49,7 +50,7 @@ export default function Hero() {
                   <input
                     className="track-real-input"
                     type="text"
-                    placeholder="Enter tracking number (e.g. TTL-2025-00491)"
+                    placeholder="Enter tracking number (e.g. DEMO-1001)"
                     name="track"
                     autoComplete="off"
                     spellCheck="false"

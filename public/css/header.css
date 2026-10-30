@@ -213,6 +213,7 @@
       gap: 60px;
     }
     .announce-strip .ticker-wrap span { flex-shrink: 0; }
+    .announce-strip .ticker-icon { height: 1.2em; width: 1.2em; vertical-align: -0.22em; }
     @keyframes ticker {
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }

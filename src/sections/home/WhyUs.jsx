@@ -35,7 +35,7 @@ export default function WhyUs() {
               <span className="underline-accent text-green">Trust</span> — Every Mile
             </h2>
             <p className="text-muted mb-3" style={{ lineHeight: "1.75" }}>
-              Global Tropical Cargo combines deep industry expertise with a powerful global freight network to
+              Demo Freight Co. combines deep industry expertise with a powerful global freight network to
               deliver your cargo safely, on time and at competitive rates. Operating out of our Arizona, USA
               headquarters, we are more than a logistics company — we are your dedicated supply chain partner.
             </p>

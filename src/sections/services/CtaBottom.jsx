@@ -14,7 +14,7 @@ export default function CtaBottom() {
           <h2>
             Move Your Cargo with
             <br />
-            <span style={{ color: "var(--green)" }}>Global Tropical</span> Cargo
+            <span style={{ color: "var(--green)" }}>Demo Freight</span> Co.
           </h2>
           <p>
             Get a free, no-obligation freight quote today. Our logistics experts are standing by to design the

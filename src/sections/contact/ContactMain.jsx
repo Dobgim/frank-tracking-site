@@ -87,7 +87,7 @@ export default function ContactMain() {
                       <input
                         type="text"
                         name="tracking_code"
-                        placeholder="e.g. TTL-2024-XXXX"
+                        placeholder="e.g. DEMO-1001"
                         className="ttl-input"
                       />
                     </div>
@@ -270,7 +270,7 @@ export default function ContactMain() {
           <div className="col-lg-4 reveal">
             <div className="location-panel">
               <div className="location-panel__info">
-                <div className="location-panel__title">Global Tropical Cargo</div>
+                <div className="location-panel__title">Demo Freight Co.</div>
                 <div className="loc-row">
                   <i className="fas fa-location-dot"></i>
                   <div className="loc-row__text">
@@ -280,13 +280,13 @@ export default function ContactMain() {
                 <div className="loc-row">
                   <i className="fas fa-phone"></i>
                   <div className="loc-row__text">
-                    <strong>Phone</strong> (559) 213-2902
+                    <strong>Phone</strong> (555) 010-0100
                   </div>
                 </div>
                 <div className="loc-row">
                   <i className="fas fa-envelope"></i>
                   <div className="loc-row__text">
-                    <strong>Email</strong> info@globaltropicalcargo.com
+                    <strong>Email</strong> demo@example.com
                   </div>
                 </div>
                 <div className="loc-row">

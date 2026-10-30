@@ -1,6 +1,7 @@
-import { handleTrackSubmit } from "../../lib/forms";
+import { useTrackSubmit } from "../../lib/forms";
 
 export default function TrackForm() {
+  const handleTrackSubmit = useTrackSubmit();
   return (
     <section className="container-fluid py-5 bg-light border-bottom border-1 td-print-none px-5 px-md-0">
       <h3 className="text-center display-5">Trace Your Package in RealTime</h3>

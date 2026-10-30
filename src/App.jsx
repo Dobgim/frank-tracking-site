@@ -7,10 +7,12 @@ import Contact from "./pages/Contact";
 import TrackAndTrace from "./pages/TrackAndTrace";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Admin from "./pages/Admin";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/admin" element={<Admin />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />

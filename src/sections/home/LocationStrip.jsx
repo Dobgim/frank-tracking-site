@@ -44,12 +44,12 @@ export default function LocationStrip() {
                   <div className="loc-info-item">
                     <i className="bi bi-telephone-fill lii-icon"></i>
                     <div className="lii-label">Phone</div>
-                    <div className="lii-value">+1(559)213-2902</div>
+                    <div className="lii-value">+1 (555) 010-0100</div>
                   </div>
                   <div className="loc-info-item">
                     <i className="bi bi-envelope-fill lii-icon"></i>
                     <div className="lii-label">Email</div>
-                    <div className="lii-value">info@globaltropicalcargo.com</div>
+                    <div className="lii-value">demo@example.com</div>
                   </div>
                   <div className="loc-info-item">
                     <i className="bi bi-clock-fill lii-icon"></i>

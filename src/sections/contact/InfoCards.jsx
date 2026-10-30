@@ -11,7 +11,7 @@ export default function InfoCards() {
             </div>
             <div>
               <div className="info-card__label">Call Us</div>
-              <div className="info-card__value">+1(559) 213-2902</div>
+              <div className="info-card__value">+1 (555) 010-0100</div>
               <div className="info-card__sub">Mon–Fri, 8 AM – 6 PM CST</div>
             </div>
           </div>
@@ -23,7 +23,7 @@ export default function InfoCards() {
             </div>
             <div>
               <div className="info-card__label">Email Us</div>
-              <div className="info-card__value">info@globaltropicalcargo.com</div>
+              <div className="info-card__value">demo@example.com</div>
               <div className="info-card__sub">Response within 2 hours</div>
             </div>
           </div>

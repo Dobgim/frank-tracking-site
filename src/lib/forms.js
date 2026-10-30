@@ -1,29 +1,33 @@
+import { useNavigate } from "react-router-dom";
 import { showToast } from "./toast";
 
-const CONTACT_EMAIL = "info@globaltropicalcargo.com";
+export function useTrackSubmit() {
+  const navigate = useNavigate();
 
-// There is no tracking backend yet: the original form posted to a PHP server.
-// Connect the real lookup here.
-export function handleTrackSubmit(event) {
-  event.preventDefault();
-  const reference = new FormData(event.currentTarget).get("track")?.trim();
-  if (!reference) {
-    showToast("error", "Please enter your tracking number.");
-    return;
-  }
-  showToast("error", `Online tracking is not connected yet. Please contact us with reference ${reference}.`);
+  return (event) => {
+    event.preventDefault();
+    const code = new FormData(event.currentTarget).get("track")?.trim().toUpperCase();
+    if (!code) {
+      showToast("error", "Please enter your tracking number.");
+      return;
+    }
+    navigate(`/track-and-trace?code=${encodeURIComponent(code)}`);
+  };
 }
 
-// Without a backend, enquiries open in the visitor's email app, ready to send.
-export function handleContactSubmit(event) {
+export async function handleContactSubmit(event) {
   event.preventDefault();
-  const data = new FormData(event.currentTarget);
-  const subject = data.get("subject") || "Website enquiry";
-  const body = [...data.entries()]
-    .filter(([name, value]) => name !== "subject" && value)
-    .map(([name, value]) => `${name.replace(/_/g, " ")}: ${value}`)
-    .join("\n");
-
-  window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  showToast("success", "Opening your email app to send this message.");
+  const form = event.currentTarget;
+  try {
+    const response = await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.fromEntries(new FormData(form))),
+    });
+    if (!response.ok) throw new Error();
+    form.reset();
+    showToast("success", "Your message has been sent.");
+  } catch {
+    showToast("error", "Your message could not be sent. Please try again.");
+  }
 }

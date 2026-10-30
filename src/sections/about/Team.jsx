@@ -31,7 +31,7 @@ export default function Team() {
                 </div>
               </div>
               <div className="team-info">
-                <h5>James R. Mitchell</h5>
+                <h5>Sample Person A</h5>
                 <div className="role">Chief Executive Officer</div>
               </div>
             </div>
@@ -52,7 +52,7 @@ export default function Team() {
                 </div>
               </div>
               <div className="team-info">
-                <h5>Maria L. Torres</h5>
+                <h5>Sample Person B</h5>
                 <div className="role">Chief Operations Officer</div>
               </div>
             </div>
@@ -73,7 +73,7 @@ export default function Team() {
                 </div>
               </div>
               <div className="team-info">
-                <h5>Derek A. Coleman</h5>
+                <h5>Sample Person C</h5>
                 <div className="role">Head of Freight</div>
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function Team() {
                 </div>
               </div>
               <div className="team-info">
-                <h5>Priya S. Nair</h5>
+                <h5>Sample Person D</h5>
                 <div className="role">Technology Director</div>
               </div>
             </div>

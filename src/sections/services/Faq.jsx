@@ -71,7 +71,7 @@ export default function Faq() {
                 </h2>
                 <div id="faq3" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                   <div className="accordion-body">
-                    Once your shipment is booked, you will receive a unique TTL tracking number. Enter it on
+                    Once your shipment is booked, you will receive a unique tracking number. Enter it on
                     our{" "}
                     <Link style={{ color: "var(--green)", fontWeight: "600" }} to="/track-and-trace">
                       Track &amp; Trace

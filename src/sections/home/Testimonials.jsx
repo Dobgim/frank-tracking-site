@@ -14,7 +14,7 @@ export default function Testimonials() {
         <div className="row g-4">
           <div className="col-md-6 col-lg-4 reveal">
             <div className="testi-card">
-              <span className="testi-ribbon">Verified Client</span>
+              <span className="testi-ribbon">Sample Review</span>
               <div className="testi-quote">"</div>
               <div className="testi-stars">
                 <i className="bi bi-star-fill"></i>
@@ -24,13 +24,13 @@ export default function Testimonials() {
                 <i className="bi bi-star-fill"></i>
               </div>
               <p className="testi-text">
-                Global Tropical Cargo has been our go-to freight partner for two years. Their real-time
+                Demo Freight Co. has been our go-to freight partner for two years. Their real-time
                 tracking portal and responsive team make cross-border shipping effortless. Highly recommend!
               </p>
               <div className="testi-author">
                 <img src="/images/pexels-3184338-w100.jpeg" alt="Client" className="testi-avatar" />
                 <div>
-                  <div className="testi-name">Michael R. Carson</div>
+                  <div className="testi-name">Sample Client A</div>
                   <div className="testi-role">Satisfied Client · Arizona, USA</div>
                 </div>
               </div>
@@ -38,7 +38,7 @@ export default function Testimonials() {
           </div>
           <div className="col-md-6 col-lg-4 reveal delay-1">
             <div className="testi-card">
-              <span className="testi-ribbon">Verified Client</span>
+              <span className="testi-ribbon">Sample Review</span>
               <div className="testi-quote">"</div>
               <div className="testi-stars">
                 <i className="bi bi-star-fill"></i>
@@ -48,14 +48,14 @@ export default function Testimonials() {
                 <i className="bi bi-star-fill"></i>
               </div>
               <p className="testi-text">
-                We rely on Global Tropical Cargo for time-sensitive medical equipment shipments across the US
+                We rely on Demo Freight Co. for time-sensitive medical equipment shipments across the US
                 and internationally. They have never missed a deadline. Outstanding reliability and
                 professionalism.
               </p>
               <div className="testi-author">
                 <img src="/images/pexels-5668858-w100.jpeg" alt="Client" className="testi-avatar" />
                 <div>
-                  <div className="testi-name">Jennifer L. Walsh</div>
+                  <div className="testi-name">Sample Client B</div>
                   <div className="testi-role">Satisfied Client · Chicago, IL</div>
                 </div>
               </div>
@@ -63,7 +63,7 @@ export default function Testimonials() {
           </div>
           <div className="col-md-6 col-lg-4 reveal delay-2">
             <div className="testi-card">
-              <span className="testi-ribbon">Verified Client</span>
+              <span className="testi-ribbon">Sample Review</span>
               <div className="testi-quote">"</div>
               <div className="testi-stars">
                 <i className="bi bi-star-fill"></i>
@@ -73,13 +73,13 @@ export default function Testimonials() {
                 <i className="bi bi-star-half"></i>
               </div>
               <p className="testi-text">
-                Switched to Global Tropical Cargo for our ocean freight imports from Asia and the difference
+                Switched to Demo Freight Co. for our ocean freight imports from Asia and the difference
                 has been night and day — competitive rates, clean documentation, zero customs delays.
               </p>
               <div className="testi-author">
                 <img src="/images/pexels-3184405-w100.jpeg" alt="Client" className="testi-avatar" />
                 <div>
-                  <div className="testi-name">David T. Nguyen</div>
+                  <div className="testi-name">Sample Client C</div>
                   <div className="testi-role">Satisfied Client · Los Angeles, CA</div>
                 </div>
               </div>

@@ -21,7 +21,7 @@ export default function Faq() {
               }}
             >
               Can't find your answer? Call us at{" "}
-              <strong style={{ color: "var(--green)" }}>(559) 213-2902</strong> or use the contact form above.
+              <strong style={{ color: "var(--green)" }}>(555) 010-0100</strong> or use the contact form above.
             </p>
             <Link className="btn-submit mt-4" to="/track-and-trace">
               {" "}
@@ -35,7 +35,7 @@ export default function Faq() {
               </div>
               <div className="faq-a">
                 You can request a quote by clicking the "Request a Quote" tab in the form above, or by calling
-                us directly at (559) 213-2902. Our team will get back to you with a competitive rate within 2
+                us directly at (555) 010-0100. Our team will get back to you with a competitive rate within 2
                 business hours.
               </div>
             </div>

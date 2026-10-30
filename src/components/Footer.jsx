@@ -52,18 +52,18 @@ export default function Footer() {
               <Link to="/">
                 {" "}
                 <img
-                  src="/assets/logo/ttllogo.png"
-                  alt="Global Tropical Cargo"
+                  src="/assets/logo/logo.svg"
+                  alt="Demo Freight Co."
                   className="footer-logo-img"
                 />{" "}
               </Link>
               <div className="footer-brand-name">
-                Global <span>Tropical</span>
+                Demo <span>Freight</span>
               </div>
               <span className="footer-tagline">Cargo</span>
               <p className="footer-desc">
                 A trusted partner in global freight forwarding, warehousing, and end-to-end supply chain
-                management. From tropical shores to every corner of the world.
+                management. From local docks to every corner of the world.
               </p>
               <div className="social-icons">
                 <a href="#" aria-label="LinkedIn">
@@ -171,7 +171,7 @@ export default function Footer() {
                 <div>
                   <div className="contact-label">Phone</div>
                   <div className="contact-value">
-                    <a href="tel:+0000000000">+1(559)213-2902</a>
+                    <a href="tel:+15550100100">+1 (555) 010-0100</a>
                   </div>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export default function Footer() {
                 <div>
                   <div className="contact-label">Email</div>
                   <div className="contact-value">
-                    <a href="mailto:info@globaltropicalcargo.com">info@globaltropicalcargo.com</a>
+                    <a href="mailto:demo@example.com">demo@example.com</a>
                   </div>
                 </div>
               </div>
@@ -213,13 +213,13 @@ export default function Footer() {
               </div>
               <div className="d-flex flex-wrap gap-2 mt-4">
                 <div className="badge-item">
-                  <i className="bi bi-shield-check"></i> ISO Certified
+                  <i className="bi bi-shield-check"></i> Sample Badge A
                 </div>
                 <div className="badge-item">
-                  <i className="bi bi-award"></i> FIATA Member
+                  <i className="bi bi-award"></i> Sample Badge B
                 </div>
                 <div className="badge-item">
-                  <i className="bi bi-globe2"></i> IATA Approved
+                  <i className="bi bi-globe2"></i> Sample Badge C
                 </div>
               </div>
             </div>
@@ -232,7 +232,7 @@ export default function Footer() {
               <div className="col-md-6">
                 <p className="copyright mb-0">
                   © <span id="year">{new Date().getFullYear()}</span>{" "}
-                  <Link to="/">Global Tropical Cargo</Link>. All rights reserved.
+                  <Link to="/">Demo Freight Co.</Link>. All rights reserved.
                 </p>
               </div>
               <div className="col-md-6">

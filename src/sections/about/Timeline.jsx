@@ -33,7 +33,7 @@ export default function Timeline() {
                 <div className="tl-year">2010</div>
                 <h5>Foundation</h5>
                 <p>
-                  Global Tropical Cargo founded in Arizona with a dedicated fleet and a mission to provide
+                  Demo Freight Co. founded in Arizona with a dedicated fleet and a mission to provide
                   reliable freight solutions across the Gulf Coast and beyond.
                 </p>
               </div>
@@ -52,7 +52,7 @@ export default function Timeline() {
                 <h5>Sea &amp; Air Freight Expansion</h5>
                 <p>
                   Launched international sea and air freight services out of the Port of Arizona, forging
-                  partnerships with global carriers including MSC, CMA CGM, and FedEx Freight.
+                  partnerships with global carriers around the world.
                 </p>
               </div>
               <div className="tl-item">

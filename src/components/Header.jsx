@@ -1,5 +1,24 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+
+const TICKER_MESSAGES = [
+  { icon: "ship", text: "Real-time cargo tracking across 50+ countries" },
+  { icon: "globe", text: "Demo Freight Co. – Your trusted freight partner" },
+  { icon: "box", text: "Air, Sea & Road Freight Solutions" },
+  { icon: "bolt", text: "Express delivery now available" },
+];
+
+function TickerMessages() {
+  return (
+    <span>
+      {TICKER_MESSAGES.map(({ icon, text }) => (
+        <Fragment key={icon}>
+          <img className="ticker-icon" src={`/images/icons/${icon}.svg`} alt="" /> {text} &nbsp;|&nbsp;{" "}
+        </Fragment>
+      ))}
+    </span>
+  );
+}
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(() => window.scrollY > 60);
@@ -16,9 +35,9 @@ export default function Header() {
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-1">
             <div className="d-flex align-items-center flex-wrap gap-1">
               <i className="bi bi-telephone-fill" style={{ color: "var(--green)" }}></i>{" "}
-              <a href="tel:+0000000000">+1(559)213-2902</a> <span className="divider">|</span>{" "}
+              <a href="tel:+15550100100">+1 (555) 010-0100</a> <span className="divider">|</span>{" "}
               <i className="bi bi-envelope-fill" style={{ color: "var(--green)" }}></i>{" "}
-              <a href="mailto:info@globaltropicalcargo.com">info@globaltropicalcargo.com</a>
+              <a href="mailto:demo@example.com">demo@example.com</a>
             </div>
             <div className="d-none d-lg-flex align-items-center gap-3">
               <span>
@@ -45,16 +64,8 @@ export default function Header() {
       </div>
       <div className="announce-strip" aria-label="Announcements">
         <div className="ticker-wrap">
-          <span>
-            🚢 Real-time cargo tracking across 50+ countries &nbsp;|&nbsp; 🌍 Global Tropical Cargo – Your
-            trusted freight partner &nbsp;|&nbsp; 📦 Air, Sea &amp; Road Freight Solutions &nbsp;|&nbsp; ⚡
-            Express delivery now available &nbsp;|&nbsp;
-          </span>{" "}
-          <span>
-            🚢 Real-time cargo tracking across 50+ countries &nbsp;|&nbsp; 🌍 Global Tropical Cargo – Your
-            trusted freight partner &nbsp;|&nbsp; 📦 Air, Sea &amp; Road Freight Solutions &nbsp;|&nbsp; ⚡
-            Express delivery now available &nbsp;|&nbsp;
-          </span>
+          <TickerMessages />
+          <TickerMessages />
         </div>
       </div>
       <nav
@@ -67,8 +78,8 @@ export default function Header() {
           <Link className="navbar-brand" to="/">
             {" "}
             <img
-              src="/assets/logo/ttllogo.png"
-              alt="Global Tropical Cargo Logo"
+              src="/assets/logo/logo.svg"
+              alt="Demo Freight Co. Logo"
               className="logo-img"
               style={{ height: "100px", width: "100px" }}
             />{" "}

@@ -34,6 +34,9 @@ export default function Layout() {
   // reveal animation replayed).
   return (
     <>
+      <div className="demo-banner" role="note">
+        Demo site with sample data. Demo Freight Co. is not a real company.
+      </div>
       <Header key={`header-${pathname}`} />
       <Outlet />
       <Footer key={`footer-${pathname}`} />
