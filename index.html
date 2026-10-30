@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global Tropical Cargo - Home</title>
+    <meta name="keywords" content="Global Tropical Cargo" />
+    <meta
+      name="description"
+      content="Welcome to Global Tropical Cargo! We are dedicated to providing exceptional shipping and logistics services to our customers."
+    />
+    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
+
+    <!--
+      Order matters: the original site loaded Bootstrap again after its header
+      and page styles, so Bootstrap wins some ties. This order reproduces that.
+    -->
+    <link rel="stylesheet" href="/css/style.min.css" />
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/css/toastr.min.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/aos.css" />
+
+    <!-- The original Contact and Track/Privacy/Terms pages never loaded Syne. -->
+    <link rel="stylesheet" href="/css/fonts-syne.css" data-page-style="/ /services /about-us" media="not all" />
+
+    <!-- Only the current route's sheet is enabled (see src/lib/pageStyles.js). -->
+    <link rel="stylesheet" href="/css/page-home.css" data-page-style="/" media="not all" />
+    <link rel="stylesheet" href="/css/page-services.css" data-page-style="/services" media="not all" />
+    <link rel="stylesheet" href="/css/page-about.css" data-page-style="/about-us" media="not all" />
+    <link rel="stylesheet" href="/css/page-contact.css" data-page-style="/contact" media="not all" />
+    <script>
+      document.querySelectorAll("link[data-page-style]").forEach(function (link) {
+        if (link.dataset.pageStyle.split(" ").indexOf(location.pathname) !== -1) link.media = "all";
+      });
+    </script>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+
+    <!-- Smartsupp Live Chat script -->
+    <script type="text/javascript">
+      var _smartsupp = _smartsupp || {};
+      _smartsupp.key = "ff66fdbbb0fc60cfce4da7dbcbea19311bb5e356";
+      window.smartsupp ||
+        (function (d) {
+          var s,
+            c,
+            o = (smartsupp = function () {
+              o._.push(arguments);
+            });
+          o._ = [];
+          s = d.getElementsByTagName("script")[0];
+          c = d.createElement("script");
+          c.type = "text/javascript";
+          c.charset = "utf-8";
+          c.async = true;
+          c.src = "https://www.smartsuppchat.com/loader.js?";
+          s.parentNode.insertBefore(c, s);
+        })(document);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
