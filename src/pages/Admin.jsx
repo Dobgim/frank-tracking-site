@@ -49,14 +49,18 @@ async function tryApi(path, options = {}) {
       body: options.body && JSON.stringify(options.body),
       signal: AbortSignal.timeout(5000),
     });
+    if (response.status === 404 || response.status === 502 || response.status === 503) {
+      return { ok: false, offline: true };
+    }
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      return { ok: false, offline: true };
+    }
     const data = await response.json();
     if (!response.ok) throw Object.assign(new Error(data.error || "Server error"), { status: response.status });
     return { ok: true, data };
   } catch (err) {
-    if (err.message === "Failed to fetch" || err.name === "AbortError" || err.name === "TimeoutError") {
-      return { ok: false, offline: true };
-    }
-    return { ok: false, error: err.message, status: err.status };
+    return { ok: false, offline: true, error: err.message, status: err.status };
   }
 }
 

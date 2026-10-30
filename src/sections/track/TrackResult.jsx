@@ -122,16 +122,20 @@ export default function TrackResult({ code }) {
         const response = await fetch(`/api/track/${encodeURIComponent(code)}`, {
           signal: AbortSignal.timeout(4000),
         });
-        const data = await response.json();
-        if (!active) return;
-        if (!response.ok) {
-          // Backend returned error — try local storage before showing error
+        const contentType = response.headers.get("content-type") || "";
+        if (!response.ok || !contentType.includes("application/json")) {
           const local = findLocalShipmentByCode(code);
-          if (local) { setError(null); setShipment(local); return; }
+          if (local) {
+            setError(null);
+            setShipment(local);
+            return;
+          }
           setShipment(null);
-          setError(data.error);
+          setError("No shipment found with that tracking code.");
           return;
         }
+        const data = await response.json();
+        if (!active) return;
         setError(null);
         setShipment(data);
       } catch {
