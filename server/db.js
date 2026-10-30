@@ -33,7 +33,21 @@ db.exec(`
     status TEXT NOT NULL,
     covered_km REAL NOT NULL DEFAULT 0,
     settled_at INTEGER NOT NULL,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    shipment_type TEXT DEFAULT 'Air Freight',
+    sender_name TEXT DEFAULT '',
+    receiver_name TEXT DEFAULT '',
+    sender_email TEXT DEFAULT '',
+    receiver_email TEXT DEFAULT '',
+    sender_number TEXT DEFAULT '',
+    receiver_number TEXT DEFAULT '',
+    sender_address TEXT DEFAULT '',
+    receiver_address TEXT DEFAULT '',
+    weight_kg REAL DEFAULT 0,
+    ship_date TEXT DEFAULT '',
+    expected_delivery_date TEXT DEFAULT '',
+    expected_delivery_time TEXT DEFAULT '',
+    piece_type TEXT DEFAULT 'Carton'
   );
   CREATE TABLE IF NOT EXISTS shipment_events (
     id INTEGER PRIMARY KEY,
@@ -48,3 +62,29 @@ db.exec(`
     created_at INTEGER NOT NULL
   );
 `);
+
+// Safe migration for existing SQLite databases
+const migrations = [
+  "ALTER TABLE shipments ADD COLUMN shipment_type TEXT DEFAULT 'Air Freight'",
+  "ALTER TABLE shipments ADD COLUMN sender_name TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN receiver_name TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN sender_email TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN receiver_email TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN sender_number TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN receiver_number TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN sender_address TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN receiver_address TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN weight_kg REAL DEFAULT 0",
+  "ALTER TABLE shipments ADD COLUMN ship_date TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN expected_delivery_date TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN expected_delivery_time TEXT DEFAULT ''",
+  "ALTER TABLE shipments ADD COLUMN piece_type TEXT DEFAULT 'Carton'",
+];
+
+for (const sql of migrations) {
+  try {
+    db.exec(sql);
+  } catch {
+    // Column already exists, safe to ignore
+  }
+}

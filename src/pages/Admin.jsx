@@ -19,20 +19,65 @@ const STATUSES = {
   delivered: "Delivered",
 };
 
-const SPEED_PRESETS = [
-  { label: "✈️ Air (900 km/h)", value: 900 },
-  { label: "⚡ Express (500 km/h)", value: 500 },
-  { label: "🚛 Road (90 km/h)", value: 90 },
-  { label: "🚢 Ocean (40 km/h)", value: 40 },
+const SHIPMENT_TYPES = [
+  "Air Freight",
+  "Ocean Freight",
+  "Road Transport",
+  "Express Courier",
+  "Rail Freight",
+  "Warehousing & Logistics",
 ];
 
-const EMPTY_FORM = {
-  code: "",
-  description: "",
-  originName: "",
-  destinationName: "",
+const PIECE_TYPES = [
+  "Carton",
+  "Pallet",
+  "Container",
+  "Box",
+  "Crate",
+  "Envelope",
+  "Barrel",
+  "Loose Cargo",
+];
+
+function getTodayDateString() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function generateTrackingCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let random = "";
+  for (let i = 0; i < 7; i++) {
+    random += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `PC-2026-M${random}`;
+}
+
+const getInitialForm = () => ({
+  code: generateTrackingCode(),
+  shipmentType: "Air Freight",
+  senderName: "",
+  receiverName: "",
+  senderEmail: "",
+  receiverEmail: "",
+  senderNumber: "",
+  receiverNumber: "",
+  originName: "Houston, USA",
+  destinationName: "London, UK",
+  weightKg: "12.5",
+  status: "pending",
+  shipDate: getTodayDateString(),
+  expectedDeliveryDate: "",
+  expectedDeliveryTime: "",
+  pieceType: "Carton",
+  senderAddress: "",
+  receiverAddress: "",
   speedKmh: 900,
-};
+  description: "",
+});
 
 // ─── Offline Credentials Fallback ─────────────────────────────────────────────
 const ADMIN_CREDENTIALS = {
@@ -40,7 +85,7 @@ const ADMIN_CREDENTIALS = {
   "admin@demofreight.test": "admin123",
 };
 
-// ─── API Helper (tries backend first, falls back to offline storage) ───────────
+// ─── API Helper ───────────────────────────────────────────────────────────────
 async function tryApi(path, options = {}) {
   try {
     const response = await fetch(`/api/admin${path}`, {
@@ -64,15 +109,6 @@ async function tryApi(path, options = {}) {
   }
 }
 
-function generateTrackingCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let random = "";
-  for (let i = 0; i < 4; i++) {
-    random += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return `PLF-${random}`;
-}
-
 // ─── Login Component ────────────────────────────────────────────────────────────
 function Login({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -85,7 +121,6 @@ function Login({ onLogin }) {
     setLoading(true);
     setError(null);
 
-    // 1. Try real Node.js backend
     const result = await tryApi("/login", { method: "POST", body: { email, password } });
     if (result.ok) {
       onLogin(result.data);
@@ -93,7 +128,6 @@ function Login({ onLogin }) {
       return;
     }
 
-    // 2. Offline fallback
     const trimmedEmail = email.trim().toLowerCase();
     const expectedPwd = ADMIN_CREDENTIALS[trimmedEmail];
     if (expectedPwd && password === expectedPwd) {
@@ -121,7 +155,7 @@ function Login({ onLogin }) {
             Prime<span style={{ color: "#1abc9c" }}>Logistics</span>
             <span style={{ color: "#f39c12" }}>Flow</span>
           </h1>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Mobile Admin Portal</p>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Admin Management Portal</p>
         </div>
 
         {error && <div className="admin-error">{error}</div>}
@@ -163,7 +197,356 @@ function Login({ onLogin }) {
   );
 }
 
-// ─── Shipment Card (Mobile-Optimized) ──────────────────────────────────────────
+// ─── Create Shipment Modal (Matches User's Screenshot Exactly) ─────────────────
+function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
+  const [form, setForm] = useState(getInitialForm);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setForm(getInitialForm());
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const payload = {
+      code: form.code.trim().toUpperCase(),
+      description: form.description.trim() || `${form.shipmentType} - ${form.pieceType}`,
+      originName: form.originName.trim(),
+      destinationName: form.destinationName.trim(),
+      speedKmh: Number(form.speedKmh) || 900,
+      status: form.status,
+      shipmentType: form.shipmentType,
+      senderName: form.senderName.trim(),
+      receiverName: form.receiverName.trim(),
+      senderEmail: form.senderEmail.trim(),
+      receiverEmail: form.receiverEmail.trim(),
+      senderNumber: form.senderNumber.trim(),
+      receiverNumber: form.receiverNumber.trim(),
+      senderAddress: form.senderAddress.trim(),
+      receiverAddress: form.receiverAddress.trim(),
+      weightKg: Number(form.weightKg) || 0,
+      shipDate: form.shipDate,
+      expectedDeliveryDate: form.expectedDeliveryDate,
+      expectedDeliveryTime: form.expectedDeliveryTime,
+      pieceType: form.pieceType,
+    };
+
+    // 1. Try real backend
+    const result = await tryApi("/shipments", { method: "POST", body: payload });
+    if (result.ok) {
+      onCreated(result.data);
+      setSubmitting(false);
+      onClose();
+      return;
+    }
+
+    // 2. Offline fallback
+    if (result.offline) {
+      try {
+        const local = createLocalShipment(payload);
+        onCreated(local);
+        setSubmitting(false);
+        onClose();
+      } catch (err) {
+        onError(err.message);
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    onError(result.error || "Failed to create shipment.");
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="admin-modal-overlay" onClick={onClose}>
+      <div className="admin-modal-dialog" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-modal-header">
+          <h2>Create New Shipment</h2>
+          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div className="admin-modal-body">
+            <div className="admin-dark-grid">
+              {/* Row 1: Tracking ID & Shipment Type */}
+              <div className="admin-dark-field">
+                <label>TRACKING ID</label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    type="text"
+                    name="code"
+                    value={form.code}
+                    onChange={handleChange}
+                    placeholder="PC-2026-M79ARFC"
+                    required
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, code: generateTrackingCode() }))}
+                    title="Generate new ID"
+                    style={{
+                      background: "#1e293b",
+                      border: "1px solid #334155",
+                      borderRadius: "8px",
+                      color: "#94a3b8",
+                      padding: "0 12px",
+                      cursor: "pointer",
+                      fontSize: "0.82rem",
+                    }}
+                  >
+                    🎲
+                  </button>
+                </div>
+              </div>
+
+              <div className="admin-dark-field">
+                <label>SHIPMENT TYPE *</label>
+                <select name="shipmentType" value={form.shipmentType} onChange={handleChange} required>
+                  <option value="">Select type</option>
+                  {SHIPMENT_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Row 2: Sender Name & Receiver Name */}
+              <div className="admin-dark-field">
+                <label>SENDER NAME *</label>
+                <input
+                  type="text"
+                  name="senderName"
+                  value={form.senderName}
+                  onChange={handleChange}
+                  placeholder="Sender name"
+                  required
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>RECEIVER NAME *</label>
+                <input
+                  type="text"
+                  name="receiverName"
+                  value={form.receiverName}
+                  onChange={handleChange}
+                  placeholder="Receiver name"
+                  required
+                />
+              </div>
+
+              {/* Row 3: Sender Email & Receiver Email */}
+              <div className="admin-dark-field">
+                <label>SENDER EMAIL</label>
+                <input
+                  type="email"
+                  name="senderEmail"
+                  value={form.senderEmail}
+                  onChange={handleChange}
+                  placeholder="sender@example.com"
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>RECEIVER EMAIL</label>
+                <input
+                  type="email"
+                  name="receiverEmail"
+                  value={form.receiverEmail}
+                  onChange={handleChange}
+                  placeholder="receiver@example.com"
+                />
+              </div>
+
+              {/* Row 4: Sender Number & Receiver Number */}
+              <div className="admin-dark-field">
+                <label>SENDER NUMBER</label>
+                <input
+                  type="tel"
+                  name="senderNumber"
+                  value={form.senderNumber}
+                  onChange={handleChange}
+                  placeholder="e.g. +1 234 567 8900"
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>RECEIVER NUMBER</label>
+                <input
+                  type="tel"
+                  name="receiverNumber"
+                  value={form.receiverNumber}
+                  onChange={handleChange}
+                  placeholder="e.g. +1 987 654 3210"
+                />
+              </div>
+
+              {/* Row 5: Origin & Destination */}
+              <div className="admin-dark-field">
+                <label>ORIGIN *</label>
+                <input
+                  type="text"
+                  name="originName"
+                  value={form.originName}
+                  onChange={handleChange}
+                  placeholder="City, Country"
+                  list="cities-list"
+                  required
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>DESTINATION *</label>
+                <input
+                  type="text"
+                  name="destinationName"
+                  value={form.destinationName}
+                  onChange={handleChange}
+                  placeholder="City, Country"
+                  list="cities-list"
+                  required
+                />
+              </div>
+
+              {/* Row 6: Weight (KG) & Status */}
+              <div className="admin-dark-field">
+                <label>WEIGHT (KG) *</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  name="weightKg"
+                  value={form.weightKg}
+                  onChange={handleChange}
+                  placeholder="0.0"
+                  required
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>STATUS *</label>
+                <select name="status" value={form.status} onChange={handleChange} required>
+                  {Object.entries(STATUSES).map(([val, lbl]) => (
+                    <option key={val} value={val}>{lbl}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Row 7: Ship Date & Expected Delivery Date */}
+              <div className="admin-dark-field">
+                <label>SHIP DATE *</label>
+                <input
+                  type="date"
+                  name="shipDate"
+                  value={form.shipDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>EXPECTED DELIVERY DATE</label>
+                <input
+                  type="date"
+                  name="expectedDeliveryDate"
+                  value={form.expectedDeliveryDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              {/* Row 8: Expected Delivery Time & Piece Type */}
+              <div className="admin-dark-field">
+                <label>EXPECTED DELIVERY TIME</label>
+                <input
+                  type="time"
+                  name="expectedDeliveryTime"
+                  value={form.expectedDeliveryTime}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>PIECE TYPE</label>
+                <select name="pieceType" value={form.pieceType} onChange={handleChange}>
+                  <option value="">Select type</option>
+                  {PIECE_TYPES.map((pt) => (
+                    <option key={pt} value={pt}>{pt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Row 9: Sender Address & Receiver Address */}
+              <div className="admin-dark-field">
+                <label>SENDER ADDRESS</label>
+                <input
+                  type="text"
+                  name="senderAddress"
+                  value={form.senderAddress}
+                  onChange={handleChange}
+                  placeholder="Full address"
+                />
+              </div>
+
+              <div className="admin-dark-field">
+                <label>RECEIVER ADDRESS</label>
+                <input
+                  type="text"
+                  name="receiverAddress"
+                  value={form.receiverAddress}
+                  onChange={handleChange}
+                  placeholder="Full address"
+                />
+              </div>
+            </div>
+
+            {/* Datalist for Cities suggestion */}
+            <datalist id="cities-list">
+              {CITIES.map((c) => (
+                <option key={c.name} value={c.name} />
+              ))}
+            </datalist>
+          </div>
+
+          <div className="admin-modal-footer">
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: "transparent",
+                border: "1px solid #334155",
+                borderRadius: "8px",
+                color: "#94a3b8",
+                padding: "12px 20px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="admin-btn-cyan" disabled={submitting}>
+              {submitting ? "Creating…" : "Create Shipment"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── Shipment Card ─────────────────────────────────────────────────────────────
 function ShipmentCard({ shipment, onChange, onError, onCopied }) {
   const [speed, setSpeed] = useState(shipment.speedKmh);
   const delivered = shipment.status === "delivered";
@@ -207,7 +590,6 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
       await navigator.clipboard.writeText(trackingUrl);
       onCopied(`Copied tracking link for ${shipment.code}`);
     } catch {
-      // Fallback
       window.prompt("Copy tracking URL:", trackingUrl);
     }
   };
@@ -217,13 +599,14 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
     : 0;
 
   return (
-    <div className="admin-shipment-card">
+    <div className="admin-shipment-card" style={{ background: "#0c1421", borderColor: "#1e293b", color: "#f1f5f9" }}>
       <div className="admin-card-top">
         <a
           href={trackingUrl}
           target="_blank"
           rel="noreferrer"
           className="admin-code-badge"
+          style={{ color: "#06b6d4" }}
           title="Click to open public tracking page"
         >
           <i className="bi bi-box-seam"></i>
@@ -235,28 +618,66 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
         </span>
       </div>
 
-      <div className="admin-card-desc">
-        {shipment.description || "General cargo"}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", margin: "8px 0" }}>
+        {shipment.shipmentType && (
+          <span style={{ fontSize: "0.75rem", background: "rgba(6, 182, 212, 0.15)", color: "#06b6d4", padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>
+            {shipment.shipmentType}
+          </span>
+        )}
+        {shipment.weightKg ? (
+          <span style={{ fontSize: "0.75rem", background: "rgba(245, 158, 11, 0.15)", color: "#f59e0b", padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>
+            {shipment.weightKg} KG
+          </span>
+        ) : null}
+        {shipment.pieceType && (
+          <span style={{ fontSize: "0.75rem", background: "rgba(148, 163, 184, 0.15)", color: "#94a3b8", padding: "2px 8px", borderRadius: "4px" }}>
+            {shipment.pieceType}
+          </span>
+        )}
       </div>
 
-      <div className="admin-card-route">
-        <i className="bi bi-geo-alt-fill" style={{ color: "#0a3d62" }}></i>
+      {/* Sender & Receiver Info */}
+      {(shipment.senderName || shipment.receiverName) && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", background: "#111c2d", padding: "10px 12px", borderRadius: "8px", fontSize: "0.82rem", margin: "10px 0" }}>
+          <div>
+            <span style={{ color: "#64748b", display: "block", fontSize: "0.7rem", textTransform: "uppercase" }}>Sender</span>
+            <strong style={{ color: "#f1f5f9" }}>{shipment.senderName || "—"}</strong>
+            {shipment.senderNumber && <div style={{ color: "#94a3b8", fontSize: "0.75rem" }}>{shipment.senderNumber}</div>}
+          </div>
+          <div>
+            <span style={{ color: "#64748b", display: "block", fontSize: "0.7rem", textTransform: "uppercase" }}>Receiver</span>
+            <strong style={{ color: "#f1f5f9" }}>{shipment.receiverName || "—"}</strong>
+            {shipment.receiverNumber && <div style={{ color: "#94a3b8", fontSize: "0.75rem" }}>{shipment.receiverNumber}</div>}
+          </div>
+        </div>
+      )}
+
+      <div className="admin-card-route" style={{ color: "#e2e8f0" }}>
+        <i className="bi bi-geo-alt-fill" style={{ color: "#06b6d4" }}></i>
         <span>{shipment.origin?.name ?? "—"}</span>
-        <i className="bi bi-arrow-right" style={{ color: "#1abc9c" }}></i>
-        <i className="bi bi-geo-alt-fill" style={{ color: "#f39c12" }}></i>
+        <i className="bi bi-arrow-right" style={{ color: "#64748b" }}></i>
+        <i className="bi bi-geo-alt-fill" style={{ color: "#f59e0b" }}></i>
         <span>{shipment.destination?.name ?? "—"}</span>
       </div>
 
-      <div className="admin-progress-bar-wrap">
-        <div className="admin-progress-bar" style={{ width: `${percent}%` }}></div>
+      <div className="admin-progress-bar-wrap" style={{ background: "#1e293b" }}>
+        <div className="admin-progress-bar" style={{ background: "linear-gradient(90deg, #0284c7, #06b6d4)", width: `${percent}%` }}></div>
       </div>
       <div className="admin-progress-meta">
-        <span>
+        <span style={{ color: "#94a3b8" }}>
           {Math.round(shipment.coveredKm ?? 0).toLocaleString()} of{" "}
           {Math.round(shipment.distanceKm ?? 0).toLocaleString()} km
         </span>
-        <b>{percent}%</b>
+        <b style={{ color: "#06b6d4" }}>{percent}%</b>
       </div>
+
+      {/* Dates row */}
+      {(shipment.shipDate || shipment.expectedDeliveryDate) && (
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "#94a3b8", marginBottom: "12px" }}>
+          <span>Shipped: {shipment.shipDate || "—"}</span>
+          <span>Delivery: {shipment.expectedDeliveryDate || "TBD"} {shipment.expectedDeliveryTime ? `at ${shipment.expectedDeliveryTime}` : ""}</span>
+        </div>
+      )}
 
       <div className="admin-card-controls">
         <select
@@ -264,6 +685,7 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
           disabled={delivered}
           onChange={(e) => patch({ status: e.target.value })}
           aria-label="Change Status"
+          style={{ background: "#141f32", borderColor: "#223249", color: "#f1f5f9" }}
         >
           {Object.entries(STATUSES).map(([value, label]) => (
             <option key={value} value={value}>
@@ -282,21 +704,24 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
           onChange={(e) => setSpeed(e.target.value)}
           onBlur={() => Number(speed) !== shipment.speedKmh && patch({ speedKmh: Number(speed) })}
           aria-label="Speed (km/h)"
+          style={{ background: "#141f32", borderColor: "#223249", color: "#f1f5f9" }}
         />
       </div>
 
-      <div className="admin-card-actions">
+      <div className="admin-card-actions" style={{ borderColor: "#1e293b" }}>
         <a
           href={trackingUrl}
           target="_blank"
           rel="noreferrer"
-          className="admin-btn-action admin-btn-track"
+          className="admin-btn-action"
+          style={{ background: "#0284c7", color: "#ffffff" }}
         >
-          <i className="bi bi-radar"></i> View Tracking
+          <i className="bi bi-radar"></i> View Live
         </a>
         <button
           type="button"
-          className="admin-btn-action admin-btn-copy"
+          className="admin-btn-action"
+          style={{ background: "#1e293b", color: "#f1f5f9" }}
           onClick={copyLink}
         >
           <i className="bi bi-clipboard"></i> Copy Link
@@ -317,14 +742,13 @@ function ShipmentCard({ shipment, onChange, onError, onCopied }) {
 function Dashboard({ admin, onLogout }) {
   const [shipments, setShipments] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
   const [lastCreated, setLastCreated] = useState(null);
   const [offline, setOffline] = useState(false);
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("shipments"); // 'shipments' | 'new' | 'messages'
-  const [creating, setCreating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const refresh = useCallback(async () => {
     const [shipRes, msgRes] = await Promise.all([tryApi("/shipments"), tryApi("/messages")]);
@@ -357,51 +781,6 @@ function Dashboard({ admin, onLogout }) {
     setTimeout(() => setNotice(null), 4000);
   };
 
-  const create = async (event) => {
-    event.preventDefault();
-    setError(null);
-    setCreating(true);
-
-    const body = {
-      code: form.code.trim().toUpperCase(),
-      description: form.description.trim() || "General cargo",
-      originName: form.originName,
-      destinationName: form.destinationName,
-      speedKmh: Number(form.speedKmh) || 900,
-    };
-
-    // 1. Try real Node.js backend
-    const result = await tryApi("/shipments", { method: "POST", body });
-    if (result.ok) {
-      setLastCreated(result.data);
-      setForm(EMPTY_FORM);
-      showNotification(`Shipment ${result.data.code} created in database!`);
-      refresh();
-      setActiveTab("shipments");
-      setCreating(false);
-      return;
-    }
-
-    // 2. Offline fallback
-    if (result.offline) {
-      try {
-        const local = createLocalShipment(body);
-        setLastCreated(local);
-        setForm(EMPTY_FORM);
-        showNotification(`Shipment ${local.code} saved to local storage!`);
-        refresh();
-        setActiveTab("shipments");
-      } catch (err) {
-        setError(err.message);
-      }
-      setCreating(false);
-      return;
-    }
-
-    setError(result.error || "Could not create shipment.");
-    setCreating(false);
-  };
-
   const logout = async () => {
     await tryApi("/logout", { method: "POST" }).catch(() => {});
     clearLocalSession();
@@ -411,31 +790,34 @@ function Dashboard({ admin, onLogout }) {
   const count = (status) => shipments.filter((s) => s.status === status).length;
 
   const filteredShipments = shipments.filter((s) => {
+    if (filterStatus !== "all" && s.status !== filterStatus) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     return (
       s.code?.toLowerCase().includes(q) ||
-      s.description?.toLowerCase().includes(q) ||
+      s.senderName?.toLowerCase().includes(q) ||
+      s.receiverName?.toLowerCase().includes(q) ||
       s.origin?.name?.toLowerCase().includes(q) ||
       s.destination?.name?.toLowerCase().includes(q) ||
+      s.shipmentType?.toLowerCase().includes(q) ||
       s.status?.toLowerCase().includes(q)
     );
   });
 
   return (
-    <div className="admin">
-      {/* Top Header */}
-      <header className="admin-header">
+    <div className="admin" style={{ background: "#070e17" }}>
+      {/* Header */}
+      <header className="admin-header" style={{ background: "#0b1522", borderBottom: "1px solid #1e293b" }}>
         <div className="admin-header-brand">
           <img src="/assets/logo/logo.svg" alt="" style={{ height: "34px", width: "34px" }} />
           <strong>
-            Prime<span style={{ color: "#1abc9c" }}>Logistics</span>
-            <span style={{ color: "#f39c12" }}>Flow</span>
+            Prime<span style={{ color: "#06b6d4" }}>Logistics</span>
+            <span style={{ color: "#f59e0b" }}>Flow</span>
           </strong>
           {offline && (
             <span
               style={{
-                background: "#f39c12",
+                background: "#f59e0b",
                 color: "#fff",
                 fontSize: "0.7rem",
                 fontWeight: 700,
@@ -449,7 +831,7 @@ function Dashboard({ admin, onLogout }) {
         </div>
 
         <div className="admin-header-user">
-          <Link to="/" className="admin-site-btn" target="_blank" rel="noreferrer">
+          <Link to="/" className="admin-site-btn" target="_blank" rel="noreferrer" style={{ color: "#06b6d4", borderColor: "#06b6d4" }}>
             <i className="bi bi-box-arrow-up-right"></i> View Site
           </Link>
           <span className="d-none d-sm-inline" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.82rem" }}>
@@ -461,32 +843,31 @@ function Dashboard({ admin, onLogout }) {
         </div>
       </header>
 
-      <main>
-        {/* Alerts & Feedback */}
+      <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "24px 16px" }}>
+        {/* Top Alerts */}
         {error && <div className="admin-error"><i className="bi bi-exclamation-triangle-fill"></i> {error}</div>}
         {notice && (
-          <div className="admin-success-banner" style={{ background: "#d1fae5", borderColor: "#6ee7b7", color: "#065f46" }}>
+          <div className="admin-success-banner" style={{ background: "#064e3b", borderColor: "#059669", color: "#a7f3d0" }}>
             <i className="bi bi-check-circle-fill"></i> {notice}
           </div>
         )}
 
-        {/* Success Banner when a shipment was just created */}
+        {/* Recently Created Alert */}
         {lastCreated && (
-          <div className="admin-success-banner">
+          <div className="admin-success-banner" style={{ background: "#0c2838", borderColor: "#0284c7", color: "#bae6fd" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", marginBottom: "10px" }}>
               <div>
-                <strong style={{ fontSize: "1.05rem", color: "#0e6251" }}>
+                <strong style={{ fontSize: "1.05rem", color: "#38bdf8" }}>
                   ✅ Shipment {lastCreated.code} is Live!
                 </strong>
-                <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#0e6251" }}>
-                  Route: {lastCreated.origin?.name} → {lastCreated.destination?.name}
+                <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#93c5fd" }}>
+                  {lastCreated.shipmentType} • {lastCreated.origin?.name} → {lastCreated.destination?.name} ({lastCreated.weightKg || 0} kg)
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setLastCreated(null)}
-                style={{ background: "none", border: 0, fontSize: "1.1rem", cursor: "pointer", color: "#0e6251" }}
-                aria-label="Dismiss"
+                style={{ background: "none", border: 0, fontSize: "1.1rem", cursor: "pointer", color: "#38bdf8" }}
               >
                 ×
               </button>
@@ -496,312 +877,172 @@ function Dashboard({ admin, onLogout }) {
                 href={`/track-and-trace?code=${lastCreated.code}`}
                 target="_blank"
                 rel="noreferrer"
-                className="admin-btn-action admin-btn-track"
-                style={{ padding: "10px 16px" }}
+                className="admin-btn-cyan"
+                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
               >
                 <i className="bi bi-radar"></i> Open Tracking Page
               </a>
               <button
                 type="button"
-                className="admin-btn-action admin-btn-copy"
-                style={{ padding: "10px 16px" }}
+                style={{
+                  background: "#1e293b",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  color: "#f1f5f9",
+                  padding: "10px 16px",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
                 onClick={() => {
                   const url = `${window.location.origin}/track-and-trace?code=${lastCreated.code}`;
                   navigator.clipboard.writeText(url);
                   showNotification("Tracking link copied to clipboard!");
                 }}
               >
-                <i className="bi bi-link-45deg"></i> Copy Client Link
+                <i className="bi bi-link-45deg"></i> Copy Link
               </button>
             </div>
           </div>
         )}
 
-        {/* Stats Grid */}
-        <div className="admin-stats">
-          <div className="admin-stat-card">
-            <b>{shipments.length}</b>
-            <span>Total Shipments</span>
-          </div>
-          {Object.entries(STATUSES).map(([value, label]) => (
-            <div className="admin-stat-card" key={value}>
-              <b>{count(value)}</b>
-              <span>{label}</span>
+        {/* STATS BAR (Matches User Screenshot 2 Exactly) */}
+        <div className="admin-stats-bar">
+          <div
+            className={`admin-stat-box ${filterStatus === "all" ? "featured" : ""}`}
+            onClick={() => setFilterStatus("all")}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="admin-stat-icon-wrap teal">
+              <i className="bi bi-box-seam"></i>
             </div>
-          ))}
-          <div className="admin-stat-card">
-            <b>{messages.length}</b>
-            <span>Inquiries</span>
+            <div className="admin-stat-info">
+              <span className="admin-stat-title">TOTAL SHIPMENTS</span>
+              <span className="admin-stat-number">{shipments.length}</span>
+            </div>
+          </div>
+
+          <div
+            className={`admin-stat-box ${filterStatus === "in_transit" ? "featured" : ""}`}
+            onClick={() => setFilterStatus(filterStatus === "in_transit" ? "all" : "in_transit")}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="admin-stat-icon-wrap amber">
+              <i className="bi bi-truck"></i>
+            </div>
+            <div className="admin-stat-info">
+              <span className="admin-stat-title">IN TRANSIT</span>
+              <span className="admin-stat-number">{count("in_transit")}</span>
+            </div>
+          </div>
+
+          <div
+            className={`admin-stat-box ${filterStatus === "delivered" ? "featured" : ""}`}
+            onClick={() => setFilterStatus(filterStatus === "delivered" ? "all" : "delivered")}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="admin-stat-icon-wrap green">
+              <i className="bi bi-check-circle"></i>
+            </div>
+            <div className="admin-stat-info">
+              <span className="admin-stat-title">DELIVERED</span>
+              <span className="admin-stat-number">{count("delivered")}</span>
+            </div>
+          </div>
+
+          <div
+            className={`admin-stat-box ${filterStatus === "pending" ? "featured" : ""}`}
+            onClick={() => setFilterStatus(filterStatus === "pending" ? "all" : "pending")}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="admin-stat-icon-wrap purple">
+              <i className="bi bi-hourglass-split"></i>
+            </div>
+            <div className="admin-stat-info">
+              <span className="admin-stat-title">PENDING</span>
+              <span className="admin-stat-number">{count("pending")}</span>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Navigation Tabs */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+        {/* Action Header & Search */}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "20px" }}>
+          <div style={{ flex: 1, minWidth: "260px" }}>
+            <input
+              type="text"
+              placeholder="🔍 Search tracking ID, sender, receiver, destination…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: "100%",
+                background: "#0c1421",
+                border: "1px solid #1e293b",
+                borderRadius: "10px",
+                padding: "12px 16px",
+                fontSize: "15px",
+                color: "#f1f5f9",
+                boxSizing: "border-box",
+                outline: "none",
+              }}
+            />
+          </div>
+
           <button
             type="button"
-            className={`admin-btn-secondary ${activeTab === "shipments" ? "active" : ""}`}
-            style={{
-              flex: 1,
-              padding: "12px",
-              background: activeTab === "shipments" ? "#0a3d62" : "#ffffff",
-              color: activeTab === "shipments" ? "#ffffff" : "#1e293b",
-              border: "1px solid #cbd5e1",
-              borderRadius: "8px",
-              fontWeight: 700,
-            }}
-            onClick={() => setActiveTab("shipments")}
+            className="admin-btn-cyan"
+            onClick={() => setModalOpen(true)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "12px 20px" }}
           >
-            <i className="bi bi-boxes"></i> Shipments ({shipments.length})
-          </button>
-          <button
-            type="button"
-            className={`admin-btn-secondary ${activeTab === "new" ? "active" : ""}`}
-            style={{
-              flex: 1,
-              padding: "12px",
-              background: activeTab === "new" ? "#0a3d62" : "#ffffff",
-              color: activeTab === "new" ? "#ffffff" : "#1e293b",
-              border: "1px solid #cbd5e1",
-              borderRadius: "8px",
-              fontWeight: 700,
-            }}
-            onClick={() => setActiveTab("new")}
-          >
-            <i className="bi bi-plus-circle"></i> New Shipment
-          </button>
-          <button
-            type="button"
-            className={`admin-btn-secondary ${activeTab === "messages" ? "active" : ""}`}
-            style={{
-              padding: "12px 16px",
-              background: activeTab === "messages" ? "#0a3d62" : "#ffffff",
-              color: activeTab === "messages" ? "#ffffff" : "#1e293b",
-              border: "1px solid #cbd5e1",
-              borderRadius: "8px",
-              fontWeight: 700,
-            }}
-            onClick={() => setActiveTab("messages")}
-          >
-            <i className="bi bi-envelope"></i> ({messages.length})
+            <i className="bi bi-plus-lg"></i> Create New Shipment
           </button>
         </div>
 
-        {/* TAB 1: NEW SHIPMENT FORM */}
-        {activeTab === "new" && (
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h2>
-                <i className="bi bi-plus-circle-fill" style={{ color: "#1abc9c" }}></i>
-                Create New Shipment
-              </h2>
-            </div>
-
-            <form onSubmit={create}>
-              <div className="admin-form-grid">
-                {/* Code Field with Generate Button */}
-                <div className="admin-form-field">
-                  <label>Tracking Code *</label>
-                  <div className="admin-code-group">
-                    <input
-                      type="text"
-                      placeholder="e.g. PLF-8821"
-                      value={form.code}
-                      onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="admin-btn-secondary"
-                      onClick={() => setForm({ ...form, code: generateTrackingCode() })}
-                      title="Generate random code"
-                    >
-                      🎲 Generate
-                    </button>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="admin-form-field">
-                  <label>Description / Contents</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Heavy Equipment, 520 kg"
-                    value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  />
-                </div>
-
-                {/* Origin City */}
-                <div className="admin-form-field">
-                  <label>Origin City *</label>
-                  <select
-                    value={form.originName}
-                    onChange={(e) => setForm({ ...form, originName: e.target.value })}
-                    required
-                  >
-                    <option value="">Select origin city…</option>
-                    {CITIES.map((c) => (
-                      <option key={c.name} value={c.name}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Destination City */}
-                <div className="admin-form-field">
-                  <label>Destination City *</label>
-                  <select
-                    value={form.destinationName}
-                    onChange={(e) => setForm({ ...form, destinationName: e.target.value })}
-                    required
-                  >
-                    <option value="">Select destination city…</option>
-                    {CITIES.map((c) => (
-                      <option key={c.name} value={c.name}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Speed & Presets */}
-                <div className="admin-form-field" style={{ gridColumn: "1 / -1" }}>
-                  <label>Transit Speed (km/h) *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100000"
-                    value={form.speedKmh}
-                    onChange={(e) => setForm({ ...form, speedKmh: e.target.value })}
-                    required
-                  />
-                  <div className="admin-presets">
-                    {SPEED_PRESETS.map((p) => (
-                      <button
-                        key={p.value}
-                        type="button"
-                        className={`admin-preset-chip ${Number(form.speedKmh) === p.value ? "active" : ""}`}
-                        onClick={() => setForm({ ...form, speedKmh: p.value })}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <button type="submit" className="admin-submit-btn" disabled={creating}>
-                <i className="bi bi-cloud-arrow-up-fill"></i>
-                {creating ? "Creating Shipment…" : "Save & Launch Shipment"}
-              </button>
-            </form>
+        {/* Shipments List */}
+        {filteredShipments.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 16px", background: "#0c1421", borderRadius: "14px", border: "1px solid #1e293b", color: "#64748b" }}>
+            <i className="bi bi-inbox" style={{ fontSize: "3rem", display: "block", marginBottom: "12px", color: "#334155" }}></i>
+            <h3 style={{ color: "#94a3b8", fontSize: "1.2rem", margin: "0 0 8px" }}>
+              {search ? "No shipments matched your search" : "No shipments yet"}
+            </h3>
+            <p style={{ margin: "0 0 16px", fontSize: "0.9rem" }}>
+              Click below to create your first shipment with all sender, receiver, and parcel details.
+            </p>
+            <button type="button" className="admin-btn-cyan" onClick={() => setModalOpen(true)}>
+              + Create New Shipment
+            </button>
           </div>
-        )}
-
-        {/* TAB 2: ACTIVE SHIPMENTS */}
-        {activeTab === "shipments" && (
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h2>
-                <i className="bi bi-box-seam-fill" style={{ color: "#0a3d62" }}></i>
-                Shipments ({filteredShipments.length})
-              </h2>
-              <button
-                type="button"
-                className="admin-btn-secondary"
-                style={{ padding: "6px 12px" }}
-                onClick={() => setActiveTab("new")}
-              >
-                + Add New
-              </button>
-            </div>
-
-            {/* Search Input for Mobile */}
-            <div style={{ marginBottom: "16px" }}>
-              <input
-                type="text"
-                placeholder="🔍 Search tracking code, city, status…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  width: "100%",
-                  border: "1.5px solid #cbd5e1",
-                  borderRadius: "8px",
-                  padding: "10px 14px",
-                  fontSize: "16px",
-                  boxSizing: "border-box",
-                }}
+        ) : (
+          <div className="admin-shipments-list">
+            {filteredShipments.map((s) => (
+              <ShipmentCard
+                key={s.id}
+                shipment={s}
+                onChange={refresh}
+                onError={setError}
+                onCopied={showNotification}
               />
-            </div>
-
-            {filteredShipments.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "40px 16px", color: "#64748b" }}>
-                <i className="bi bi-inbox" style={{ fontSize: "2.5rem", display: "block", marginBottom: "8px" }}></i>
-                {search ? "No shipments matched your search." : "No shipments yet."}
-                <div style={{ marginTop: "12px" }}>
-                  <button
-                    type="button"
-                    className="admin-btn-action admin-btn-track"
-                    style={{ margin: "0 auto", padding: "10px 20px" }}
-                    onClick={() => setActiveTab("new")}
-                  >
-                    Create First Shipment
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="admin-shipments-list">
-                {filteredShipments.map((s) => (
-                  <ShipmentCard
-                    key={s.id}
-                    shipment={s}
-                    onChange={refresh}
-                    onError={setError}
-                    onCopied={showNotification}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 3: CONTACT MESSAGES */}
-        {activeTab === "messages" && (
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h2>
-                <i className="bi bi-envelope-fill" style={{ color: "#0a3d62" }}></i>
-                Customer Inquiries ({messages.length})
-              </h2>
-            </div>
-
-            {messages.length === 0 ? (
-              <p style={{ color: "#64748b", textAlign: "center", padding: "30px 0" }}>No customer messages yet.</p>
-            ) : (
-              messages.map(({ id, at, ...fields }) => (
-                <div className="admin-message-card" key={id}>
-                  <small>
-                    <i className="bi bi-clock"></i> {new Date(at).toLocaleString()}
-                  </small>
-                  {Object.entries(fields).map(([name, value]) => (
-                    <div key={name} style={{ marginBottom: "4px" }}>
-                      <b>{name.replace(/_/g, " ")}:</b> {String(value)}
-                    </div>
-                  ))}
-                </div>
-              ))
-            )}
+            ))}
           </div>
         )}
       </main>
+
+      {/* CREATE SHIPMENT MODAL (Screenshot 1) */}
+      <CreateShipmentModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreated={(newShipment) => {
+          setLastCreated(newShipment);
+          showNotification(`Shipment ${newShipment.code} successfully created!`);
+          refresh();
+        }}
+        onError={setError}
+      />
     </div>
   );
 }
 
 // ─── Root Admin Component ───────────────────────────────────────────────────────
 export default function Admin() {
-  const [admin, setAdmin] = useState(undefined); // undefined = loading
+  const [admin, setAdmin] = useState(undefined);
 
   const logout = useCallback(() => {
     clearLocalSession();
@@ -811,13 +1052,11 @@ export default function Admin() {
   useEffect(() => {
     document.title = "PrimeLogisticsFlow - Admin Dashboard";
 
-    // 1. Check server session
     tryApi("/me").then((result) => {
       if (result.ok) {
         setAdmin(result.data);
         return;
       }
-      // 2. Fall back to local session
       const localSession = getLocalSession();
       setAdmin(localSession || null);
     });
@@ -831,7 +1070,7 @@ export default function Admin() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#061f33",
+          background: "#070e17",
           color: "#fff",
           fontSize: "1.1rem",
         }}
@@ -842,7 +1081,7 @@ export default function Admin() {
             alt=""
             style={{ height: "56px", width: "56px", marginBottom: "16px" }}
           />
-          <div>Loading PrimeLogisticsFlow Admin…</div>
+          <div style={{ color: "#06b6d4", fontWeight: 600 }}>Loading PrimeLogisticsFlow Admin…</div>
         </div>
       </div>
     );

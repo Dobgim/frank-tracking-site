@@ -211,10 +211,33 @@ export function findLocalShipmentByCode(code) {
   };
 }
 
-export function createLocalShipment({ code, description, originName, destinationName, speedKmh }) {
-  const origin = CITIES.find((c) => c.name === originName);
-  const destination = CITIES.find((c) => c.name === destinationName);
-  if (!origin || !destination) throw new Error("Invalid origin or destination.");
+export function createLocalShipment({
+  code,
+  description = "General cargo",
+  originName,
+  destinationName,
+  speedKmh = 900,
+  status = "pending",
+  shipmentType = "Air Freight",
+  senderName = "",
+  receiverName = "",
+  senderEmail = "",
+  receiverEmail = "",
+  senderNumber = "",
+  receiverNumber = "",
+  senderAddress = "",
+  receiverAddress = "",
+  weightKg = 0,
+  shipDate = "",
+  expectedDeliveryDate = "",
+  expectedDeliveryTime = "",
+  pieceType = "Carton",
+}) {
+  let origin = CITIES.find((c) => c.name.toLowerCase() === (originName || "").toLowerCase());
+  let destination = CITIES.find((c) => c.name.toLowerCase() === (destinationName || "").toLowerCase());
+  if (!origin && originName) origin = { name: originName.trim(), lat: 29.76, lng: -95.37 };
+  if (!destination && destinationName) destination = { name: destinationName.trim(), lat: 51.51, lng: -0.13 };
+  if (!origin || !destination) throw new Error("Please specify both origin and destination.");
   const cleanCode = code.trim().toUpperCase();
 
   const list = getLocalShipments();
@@ -229,15 +252,28 @@ export function createLocalShipment({ code, description, originName, destination
     description: description || "General cargo",
     origin,
     destination,
-    distanceKm,
+    distanceKm: distanceKm || 5000,
     speedKmh: Number(speedKmh) || 900,
-    status: "in_transit",
+    status: status || "pending",
     coveredKm: 0,
     settledAt: Date.now(),
     createdAt: Date.now(),
+    shipmentType,
+    senderName,
+    receiverName,
+    senderEmail,
+    receiverEmail,
+    senderNumber,
+    receiverNumber,
+    senderAddress,
+    receiverAddress,
+    weightKg: Number(weightKg) || 0,
+    shipDate,
+    expectedDeliveryDate,
+    expectedDeliveryTime,
+    pieceType,
     events: [
-      { status: "pending", coveredKm: 0, at: Date.now() },
-      { status: "in_transit", coveredKm: 0, at: Date.now() },
+      { status: status || "pending", coveredKm: 0, at: Date.now() },
     ],
   };
 

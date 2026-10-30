@@ -191,7 +191,97 @@ export default function TrackResult({ code }) {
         </div>
       </div>
       <ShipmentMap key={shipment.code} shipment={shipment} />
-      <ul className="track-events">
+
+      {/* Rich Shipment Details Card */}
+      <div
+        style={{
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "14px",
+          padding: "24px",
+          marginTop: "24px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+        }}
+      >
+        <h4 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#061f33", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <i className="bi bi-file-earmark-text" style={{ color: "#06b6d4" }}></i>
+          Consignment &amp; Waybill Specifications
+        </h4>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
+          {/* Sender Details */}
+          <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#0284c7", textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>
+              <i className="bi bi-person-up"></i> Shipper / Sender
+            </span>
+            <strong style={{ fontSize: "1rem", color: "#0f172a", display: "block" }}>{shipment.senderName || "Confidential Client"}</strong>
+            {shipment.senderEmail && <div style={{ fontSize: "0.85rem", color: "#64748b", marginTop: "2px" }}>{shipment.senderEmail}</div>}
+            {shipment.senderNumber && <div style={{ fontSize: "0.85rem", color: "#64748b" }}>{shipment.senderNumber}</div>}
+            {shipment.senderAddress && <div style={{ fontSize: "0.85rem", color: "#334155", marginTop: "4px" }}>{shipment.senderAddress}</div>}
+            <div style={{ fontSize: "0.82rem", color: "#0a3d62", fontWeight: 600, marginTop: "6px" }}>Origin: {shipment.origin?.name}</div>
+          </div>
+
+          {/* Receiver Details */}
+          <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>
+              <i className="bi bi-person-check"></i> Consignee / Receiver
+            </span>
+            <strong style={{ fontSize: "1rem", color: "#0f172a", display: "block" }}>{shipment.receiverName || "Registered Consignee"}</strong>
+            {shipment.receiverEmail && <div style={{ fontSize: "0.85rem", color: "#64748b", marginTop: "2px" }}>{shipment.receiverEmail}</div>}
+            {shipment.receiverNumber && <div style={{ fontSize: "0.85rem", color: "#64748b" }}>{shipment.receiverNumber}</div>}
+            {shipment.receiverAddress && <div style={{ fontSize: "0.85rem", color: "#334155", marginTop: "4px" }}>{shipment.receiverAddress}</div>}
+            <div style={{ fontSize: "0.82rem", color: "#0a3d62", fontWeight: 600, marginTop: "6px" }}>Destination: {shipment.destination?.name}</div>
+          </div>
+
+          {/* Package Details */}
+          <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>
+              <i className="bi bi-box"></i> Cargo Specifications
+            </span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "0.85rem" }}>
+              <div>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Type</span>
+                <strong>{shipment.shipmentType || "Air Freight"}</strong>
+              </div>
+              <div>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Weight</span>
+                <strong>{shipment.weightKg ? `${shipment.weightKg} kg` : "Standard"}</strong>
+              </div>
+              <div>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Packaging</span>
+                <strong>{shipment.pieceType || "Carton"}</strong>
+              </div>
+              <div>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Status</span>
+                <span className={`track-status track-status--${shipment.status}`} style={{ fontSize: "0.75rem", padding: "2px 8px" }}>
+                  {LABELS[shipment.status]}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Details */}
+          <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>
+              <i className="bi bi-calendar-event"></i> Schedule &amp; Delivery
+            </span>
+            <div style={{ fontSize: "0.85rem", color: "#334155" }}>
+              <div style={{ marginBottom: "6px" }}>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Dispatch Date</span>
+                <strong>{shipment.shipDate || "Registered"}</strong>
+              </div>
+              <div>
+                <span style={{ color: "#64748b", display: "block", fontSize: "0.75rem" }}>Estimated Delivery</span>
+                <strong style={{ color: "#065f46" }}>
+                  {shipment.expectedDeliveryDate || "In Schedule"} {shipment.expectedDeliveryTime ? `(${shipment.expectedDeliveryTime})` : ""}
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul className="track-events" style={{ marginTop: "24px" }}>
         {shipment.events.map((event, i) => (
           <li key={i}>
             <strong>{LABELS[event.status]}</strong> at {Math.round(event.coveredKm).toLocaleString()} km

@@ -48,18 +48,49 @@ app.get("/api/admin/cities", (req, res) => res.json(CITIES));
 app.get("/api/admin/shipments", (req, res) => res.json(listShipments()));
 
 app.post("/api/admin/shipments", (req, res) => {
-  const { code, description, originName, destinationName, speedKmh } = req.body;
-  const origin = CITIES.find((c) => c.name === originName);
-  const destination = CITIES.find((c) => c.name === destinationName);
+  const {
+    code,
+    description,
+    originName,
+    destinationName,
+    speedKmh = 900,
+    status = "pending",
+    shipmentType = "Air Freight",
+    senderName = "",
+    receiverName = "",
+    senderEmail = "",
+    receiverEmail = "",
+    senderNumber = "",
+    receiverNumber = "",
+    senderAddress = "",
+    receiverAddress = "",
+    weightKg = 0,
+    shipDate = "",
+    expectedDeliveryDate = "",
+    expectedDeliveryTime = "",
+    pieceType = "Carton",
+  } = req.body;
+
+  let origin = CITIES.find((c) => c.name.toLowerCase() === (originName || "").toLowerCase());
+  let destination = CITIES.find((c) => c.name.toLowerCase() === (destinationName || "").toLowerCase());
+
+  if (!origin && originName) {
+    origin = { name: originName.trim(), lat: 29.76, lng: -95.37 };
+  }
+  if (!destination && destinationName) {
+    destination = { name: destinationName.trim(), lat: 51.51, lng: -0.13 };
+  }
+
   const cleanCode = typeof code === "string" ? code.trim().toUpperCase() : "";
 
   if (!/^[A-Z0-9-]{3,30}$/.test(cleanCode)) {
     return res.status(400).json({ error: "Tracking code must be 3-30 letters, numbers or dashes." });
   }
-  if (!origin || !destination || origin === destination) {
-    return res.status(400).json({ error: "Choose two different cities." });
+  if (!origin || !destination) {
+    return res.status(400).json({ error: "Please provide both origin and destination." });
   }
-  if (!validSpeed(speedKmh)) return res.status(400).json({ error: "Speed must be between 1 and 100000 km/h." });
+  const speed = Number(speedKmh) || 900;
+  if (!validSpeed(speed)) return res.status(400).json({ error: "Speed must be between 1 and 100000 km/h." });
 
   try {
     res.status(201).json(
@@ -68,7 +99,22 @@ app.post("/api/admin/shipments", (req, res) => {
         description: String(description || "General cargo").slice(0, 200),
         origin,
         destination,
-        speedKmh,
+        speedKmh: speed,
+        status,
+        shipmentType,
+        senderName,
+        receiverName,
+        senderEmail,
+        receiverEmail,
+        senderNumber,
+        receiverNumber,
+        senderAddress,
+        receiverAddress,
+        weightKg: Number(weightKg) || 0,
+        shipDate,
+        expectedDeliveryDate,
+        expectedDeliveryTime,
+        pieceType,
       }),
     );
   } catch (error) {

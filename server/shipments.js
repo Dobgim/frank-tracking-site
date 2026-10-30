@@ -77,6 +77,20 @@ function present(row) {
     speedKmh: row.speed_kmh,
     status: row.status,
     coveredKm: row.covered_km,
+    shipmentType: row.shipment_type || "Air Freight",
+    senderName: row.sender_name || "",
+    receiverName: row.receiver_name || "",
+    senderEmail: row.sender_email || "",
+    receiverEmail: row.receiver_email || "",
+    senderNumber: row.sender_number || "",
+    receiverNumber: row.receiver_number || "",
+    senderAddress: row.sender_address || "",
+    receiverAddress: row.receiver_address || "",
+    weightKg: row.weight_kg ?? 0,
+    shipDate: row.ship_date || "",
+    expectedDeliveryDate: row.expected_delivery_date || "",
+    expectedDeliveryTime: row.expected_delivery_time || "",
+    pieceType: row.piece_type || "Carton",
     events: events.map((e) => ({ status: e.status, coveredKm: e.covered_km, at: e.created_at })),
   };
 }
@@ -95,13 +109,38 @@ export function listShipments() {
     .map((row) => present(settle(row)));
 }
 
-export function createShipment({ code, description, origin, destination, speedKmh, status = "pending" }) {
+export function createShipment({
+  code,
+  description = "General cargo",
+  origin,
+  destination,
+  speedKmh = 900,
+  status = "pending",
+  shipmentType = "Air Freight",
+  senderName = "",
+  receiverName = "",
+  senderEmail = "",
+  receiverEmail = "",
+  senderNumber = "",
+  receiverNumber = "",
+  senderAddress = "",
+  receiverAddress = "",
+  weightKg = 0,
+  shipDate = "",
+  expectedDeliveryDate = "",
+  expectedDeliveryTime = "",
+  pieceType = "Carton",
+}) {
   const now = Date.now();
   const { lastInsertRowid } = db
     .prepare(
-      `INSERT INTO shipments (code, description, origin_name, origin_lat, origin_lng, dest_name, dest_lat, dest_lng,
-        distance_km, speed_kmh, status, covered_km, settled_at, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+      `INSERT INTO shipments (
+        code, description, origin_name, origin_lat, origin_lng, dest_name, dest_lat, dest_lng,
+        distance_km, speed_kmh, status, covered_km, settled_at, created_at,
+        shipment_type, sender_name, receiver_name, sender_email, receiver_email,
+        sender_number, receiver_number, sender_address, receiver_address,
+        weight_kg, ship_date, expected_delivery_date, expected_delivery_time, piece_type
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       code,
@@ -117,6 +156,20 @@ export function createShipment({ code, description, origin, destination, speedKm
       status,
       now,
       now,
+      shipmentType,
+      senderName,
+      receiverName,
+      senderEmail,
+      receiverEmail,
+      senderNumber,
+      receiverNumber,
+      senderAddress,
+      receiverAddress,
+      weightKg,
+      shipDate,
+      expectedDeliveryDate,
+      expectedDeliveryTime,
+      pieceType,
     );
   addEvent(lastInsertRowid, status, 0, now);
   return present(byId(lastInsertRowid));
