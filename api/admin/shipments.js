@@ -1,4 +1,4 @@
-// GET /api/admin/shipments & POST /api/admin/shipments
+// /api/admin/shipments — GET (list), POST (create), PATCH (update by ?id=), DELETE (delete by ?id=)
 import {
   getDb,
   ensureSchema,
@@ -9,8 +9,8 @@ import {
   json,
   setCors,
   readBody,
-} from "../../_db.js";
-import { requireAdmin } from "../_guard.js";
+} from "../_db.js";
+import { requireAdmin } from "./_guard.js";
 
 const STATUSES = ["pending", "in_transit", "on_hold", "delivered"];
 
@@ -29,7 +29,15 @@ export default async function handler(req, res) {
     const admin = await requireAdmin(req, res, sql);
     if (!admin) return;
 
-    // ── GET: List all shipments ─────────────────────────────────────────────
+    // Check if ID is provided in query params (?id=123) or URL path
+    let idParam = req.query?.id;
+    if (!idParam && req.url) {
+      const match = req.url.match(/\/shipments\/(\d+)/);
+      if (match) idParam = match[1];
+    }
+    const id = idParam ? Number(idParam) : null;
+
+    // ── 1. GET: List all shipments ──────────────────────────────────────────
     if (req.method === "GET") {
       const rows = await sql`SELECT * FROM shipments ORDER BY id DESC`;
       const allEvents = await sql`SELECT * FROM shipment_events ORDER BY id DESC`;
@@ -50,7 +58,7 @@ export default async function handler(req, res) {
         const arrived = row.status === "in_transit" && covered >= Number(row.distance_km);
         const status = arrived ? "delivered" : row.status;
 
-        if (arrived) {
+        if (arrived && row.status !== "delivered") {
           await sql`
             UPDATE shipments SET covered_km = ${covered}, status = 'delivered', settled_at = ${now} WHERE id = ${row.id}
           `;
@@ -67,7 +75,7 @@ export default async function handler(req, res) {
       return json(res, 200, shipments);
     }
 
-    // ── POST: Create new shipment ───────────────────────────────────────────
+    // ── 2. POST: Create a new shipment ──────────────────────────────────────
     if (req.method === "POST") {
       const body = await readBody(req);
       const {
@@ -160,9 +168,70 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── 3. PATCH: Update shipment status/speed ──────────────────────────────
+    if (req.method === "PATCH") {
+      if (!id || Number.isNaN(id)) return json(res, 400, { error: "Shipment ID required." });
+
+      const [row] = await sql`SELECT * FROM shipments WHERE id = ${id}`;
+      if (!row) return json(res, 404, { error: "Shipment not found." });
+
+      const body = await readBody(req);
+      const { status, speedKmh } = body;
+
+      if (status !== undefined && !STATUSES.includes(status)) {
+        return json(res, 400, { error: "Unknown status." });
+      }
+      if (speedKmh !== undefined && !validSpeed(Number(speedKmh))) {
+        return json(res, 400, { error: "Speed must be between 1 and 100000 km/h." });
+      }
+
+      const now = Date.now();
+      const currentCovered = coveredAt(row, now);
+      const currentStatus = row.status;
+
+      if (currentStatus === "delivered" && status && status !== "delivered") {
+        return json(res, 409, { error: "A delivered shipment cannot change status." });
+      }
+
+      const nextStatus = status || currentStatus;
+      const nextSpeed = speedKmh !== undefined ? Number(speedKmh) : Number(row.speed_kmh);
+      const covered = nextStatus === "delivered" ? Number(row.distance_km) : currentCovered;
+
+      const [updated] = await sql`
+        UPDATE shipments
+        SET status = ${nextStatus},
+            speed_kmh = ${nextSpeed},
+            covered_km = ${covered},
+            settled_at = ${now}
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      if (nextStatus !== currentStatus) {
+        await sql`
+          INSERT INTO shipment_events (shipment_id, status, covered_km, created_at)
+          VALUES (${id}, ${nextStatus}, ${covered}, ${now})
+        `;
+      }
+
+      const events = await sql`
+        SELECT status, covered_km, created_at FROM shipment_events WHERE shipment_id = ${id} ORDER BY id DESC
+      `;
+
+      return json(res, 200, present(updated, events));
+    }
+
+    // ── 4. DELETE: Delete shipment ──────────────────────────────────────────
+    if (req.method === "DELETE") {
+      if (!id || Number.isNaN(id)) return json(res, 400, { error: "Shipment ID required." });
+
+      await sql`DELETE FROM shipments WHERE id = ${id}`;
+      return json(res, 200, { ok: true });
+    }
+
     return json(res, 405, { error: "Method not allowed." });
   } catch (err) {
-    console.error(err);
+    console.error("Admin shipments error:", err);
     return json(res, 500, { error: err.message || "Server error." });
   }
 }

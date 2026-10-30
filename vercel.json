@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/track/:code",
+      "destination": "/api/track?code=:code"
+    },
+    {
+      "source": "/api/admin/shipments/:id",
+      "destination": "/api/admin/shipments?id=:id"
+    },
+    {
       "source": "/((?!api/.*).*)",
       "destination": "/index.html"
     }
