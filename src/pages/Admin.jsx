@@ -53,7 +53,7 @@ function generateTrackingCode() {
   for (let i = 0; i < 7; i++) {
     random += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `PC-2026-M${random}`;
+  return `GTC-2026-M${random}`;
 }
 
 const getInitialForm = () => ({
@@ -291,7 +291,7 @@ function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
                     name="code"
                     value={form.code}
                     onChange={handleChange}
-                    placeholder="PC-2026-M79ARFC"
+                    placeholder="GTC-2026-M79ARFC"
                     required
                     style={{ flex: 1 }}
                   />
