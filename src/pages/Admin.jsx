@@ -306,10 +306,10 @@ function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
                       color: "#94a3b8",
                       padding: "0 12px",
                       cursor: "pointer",
-                      fontSize: "0.82rem",
+                      fontSize: "0.95rem",
                     }}
                   >
-                    🎲
+                    <i className="bi bi-shuffle"></i>
                   </button>
                 </div>
               </div>
@@ -857,8 +857,8 @@ function Dashboard({ admin, onLogout }) {
           <div className="admin-success-banner" style={{ background: "#0c2838", borderColor: "#0284c7", color: "#bae6fd" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", marginBottom: "10px" }}>
               <div>
-                <strong style={{ fontSize: "1.05rem", color: "#38bdf8" }}>
-                  ✅ Shipment {lastCreated.code} is Live!
+                <strong style={{ fontSize: "1.05rem", color: "#38bdf8", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <i className="bi bi-check-circle-fill"></i> Shipment {lastCreated.code} is Live!
                 </strong>
                 <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#93c5fd" }}>
                   {lastCreated.shipmentType} • {lastCreated.origin?.name} → {lastCreated.destination?.name} ({lastCreated.weightKg || 0} kg)
@@ -969,7 +969,7 @@ function Dashboard({ admin, onLogout }) {
           <div style={{ flex: 1, minWidth: "260px" }}>
             <input
               type="text"
-              placeholder="🔍 Search tracking ID, sender, receiver, destination…"
+              placeholder="Search tracking ID, sender, receiver, destination…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
