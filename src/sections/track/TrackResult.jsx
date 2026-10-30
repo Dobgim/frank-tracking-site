@@ -174,7 +174,7 @@ export default function TrackResult({ code }) {
   return (
     <section className="container py-5">
       <p className="track-demo-note" style={{ background: "#e8f8f5", color: "#117a65", borderColor: "#a3e4d7" }}>
-        <i className="bi bi-shield-check"></i> PrimeLogisticsFlow Global Tracking &bull; Real-time status update
+        <i className="bi bi-shield-check"></i> Global Tropical Cargos Global Tracking &bull; Real-time status update
       </p>
       <div className="track-summary">
         <div>

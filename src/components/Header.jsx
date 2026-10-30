@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from "react";
 
 const TICKER_MESSAGES = [
   { icon: "ship", text: "Real-time cargo tracking across 85+ countries" },
-  { icon: "globe", text: "PrimeLogisticsFlow – Your trusted freight & cargo partner" },
+  { icon: "globe", text: "Global Tropical Cargos – Your trusted freight & cargo partner" },
   { icon: "box", text: "Air, Sea & Road Freight Solutions" },
   { icon: "bolt", text: "Express delivery & live GPS tracking now active" },
 ];
@@ -37,7 +37,7 @@ export default function Header() {
               <i className="bi bi-telephone-fill" style={{ color: "var(--green)" }}></i>{" "}
               <a href="tel:+15550100100">+1 (555) 010-0100</a> <span className="divider">|</span>{" "}
               <i className="bi bi-envelope-fill" style={{ color: "var(--green)" }}></i>{" "}
-              <a href="mailto:support@primelogisticsflow.com">support@primelogisticsflow.com</a>
+              <a href="mailto:support@globaltropicalcargos.com">support@globaltropicalcargos.com</a>
             </div>
             <div className="d-none d-lg-flex align-items-center gap-3">
               <span>
@@ -79,13 +79,13 @@ export default function Header() {
             {" "}
             <img
               src="/assets/logo/logo.svg"
-              alt="PrimeLogisticsFlow Logo"
+              alt="Global Tropical Cargos Logo"
               className="logo-img"
               style={{ height: "54px", width: "54px", objectFit: "contain" }}
             />{" "}
             <div className="d-flex flex-column text-start">
               <span style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", letterSpacing: "0.5px", lineHeight: "1.1" }}>
-                Prime<span style={{ color: "var(--green)" }}>Logistics</span><span style={{ color: "var(--orange)" }}>Flow</span>
+                Global<span style={{ color: "var(--green)" }}>Tropical</span><span style={{ color: "var(--orange)" }}>Cargos</span>
               </span>
               <span style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.72)", letterSpacing: "1.2px", textTransform: "uppercase", fontWeight: 600 }}>
                 Global Freight &amp; Cargo

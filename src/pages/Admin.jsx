@@ -81,7 +81,7 @@ const getInitialForm = () => ({
 
 // ─── Offline Credentials Fallback ─────────────────────────────────────────────
 const ADMIN_CREDENTIALS = {
-  "admin@primelogisticsflow.com": "admin123",
+  "admin@globaltropicalcargos.com": "admin123",
   "admin@demofreight.test": "admin123",
 };
 
@@ -148,12 +148,12 @@ function Login({ onLogin }) {
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <img
             src="/assets/logo/logo.svg"
-            alt="PrimeLogisticsFlow"
+            alt="Global Tropical Cargos"
             style={{ height: "60px", width: "60px", marginBottom: "12px" }}
           />
           <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#061f33", marginBottom: "4px" }}>
-            Prime<span style={{ color: "#1abc9c" }}>Logistics</span>
-            <span style={{ color: "#f39c12" }}>Flow</span>
+            Global<span style={{ color: "#1abc9c" }}>Tropical</span>
+            <span style={{ color: "#f39c12" }}>Cargos</span>
           </h1>
           <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Admin Management Portal</p>
         </div>
@@ -166,7 +166,7 @@ function Login({ onLogin }) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@primelogisticsflow.com"
+            placeholder="admin@globaltropicalcargos.com"
             required
             autoFocus
           />
@@ -510,6 +510,23 @@ function CreateShipmentModal({ isOpen, onClose, onCreated, onError }) {
                   placeholder="Full address"
                 />
               </div>
+
+              {/* Description field - full width */}
+              <div className="admin-dark-field" style={{ gridColumn: "1 / -1" }}>
+                <label>SHIPMENT DESCRIPTION</label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="e.g. Electronic Components, Auto Parts, Medical Equipment…"
+                  rows={3}
+                  style={{
+                    resize: "vertical",
+                    minHeight: "80px",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
             </div>
 
             {/* Datalist for Cities suggestion */}
@@ -811,8 +828,8 @@ function Dashboard({ admin, onLogout }) {
         <div className="admin-header-brand">
           <img src="/assets/logo/logo.svg" alt="" style={{ height: "34px", width: "34px" }} />
           <strong>
-            Prime<span style={{ color: "#06b6d4" }}>Logistics</span>
-            <span style={{ color: "#f59e0b" }}>Flow</span>
+            Global<span style={{ color: "#06b6d4" }}>Tropical</span>
+            <span style={{ color: "#f59e0b" }}>Cargos</span>
           </strong>
           {offline && (
             <span
@@ -1050,7 +1067,7 @@ export default function Admin() {
   }, []);
 
   useEffect(() => {
-    document.title = "PrimeLogisticsFlow - Admin Dashboard";
+    document.title = "Global Tropical Cargos - Admin Dashboard";
 
     tryApi("/me").then((result) => {
       if (result.ok) {
@@ -1081,7 +1098,7 @@ export default function Admin() {
             alt=""
             style={{ height: "56px", width: "56px", marginBottom: "16px" }}
           />
-          <div style={{ color: "#06b6d4", fontWeight: 600 }}>Loading PrimeLogisticsFlow Admin…</div>
+          <div style={{ color: "#06b6d4", fontWeight: 600 }}>Loading Global Tropical Cargos Admin…</div>
         </div>
       </div>
     );

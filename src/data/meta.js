@@ -1,42 +1,42 @@
 export const META = {
   "/": {
-    title: "PrimeLogisticsFlow - Global Freight & Cargo Solutions",
-    keywords: "PrimeLogisticsFlow, prime logistics flow, freight forwarding, cargo tracking, global shipping",
+    title: "Global Tropical Cargos - Global Freight & Cargo Solutions",
+    keywords: "Global Tropical Cargos, globaltropicalcargos, freight forwarding, cargo tracking, global shipping",
     description:
-      "Welcome to PrimeLogisticsFlow! We deliver exceptional shipping, air, ocean, and ground logistics services with real-time tracking.",
+      "Welcome to Global Tropical Cargos! We deliver exceptional shipping, air, ocean, and ground logistics services with real-time tracking.",
   },
   "/services": {
-    title: "PrimeLogisticsFlow - Freight & Logistics Services",
-    keywords: "PrimeLogisticsFlow, logistics services, ocean freight, air freight, warehousing",
+    title: "Global Tropical Cargos - Freight & Logistics Services",
+    keywords: "Global Tropical Cargos, logistics services, ocean freight, air freight, warehousing",
     description:
-      "Explore PrimeLogisticsFlow express shipping services, including international air cargo, ocean shipping, road freight, and customs clearance.",
+      "Explore Global Tropical Cargos express shipping services, including international air cargo, ocean shipping, road freight, and customs clearance.",
   },
   "/about-us": {
-    title: "PrimeLogisticsFlow - About Us",
-    keywords: "About PrimeLogisticsFlow, global freight company",
+    title: "Global Tropical Cargos - About Us",
+    keywords: "About Global Tropical Cargos, global freight company",
     description:
-      "Learn about PrimeLogisticsFlow, our global network across 85+ countries, and our state-of-the-art cargo tracking systems.",
+      "Learn about Global Tropical Cargos, our global network across 85+ countries, and our state-of-the-art cargo tracking systems.",
   },
   "/contact": {
-    title: "PrimeLogisticsFlow - Contact Us",
-    keywords: "Contact PrimeLogisticsFlow, freight quote, shipping support",
+    title: "Global Tropical Cargos - Contact Us",
+    keywords: "Contact Global Tropical Cargos, freight quote, shipping support",
     description:
-      "Get in touch with PrimeLogisticsFlow. Request a free shipping quote or speak with our global logistics experts today.",
+      "Get in touch with Global Tropical Cargos. Request a free shipping quote or speak with our global logistics experts today.",
   },
   "/track-and-trace": {
-    title: "PrimeLogisticsFlow - Live Track & Trace",
-    keywords: "Track and Trace, PrimeLogisticsFlow tracking, live shipment tracking",
+    title: "Global Tropical Cargos - Live Track & Trace",
+    keywords: "Track and Trace, Global Tropical Cargos tracking, live shipment tracking",
     description:
-      "Track your cargo in real time with PrimeLogisticsFlow interactive live GPS route and status monitoring.",
+      "Track your cargo in real time with Global Tropical Cargos interactive live GPS route and status monitoring.",
   },
   "/privacy": {
-    title: "PrimeLogisticsFlow - Privacy Policy",
-    keywords: "PrimeLogisticsFlow Privacy Policy",
+    title: "Global Tropical Cargos - Privacy Policy",
+    keywords: "Global Tropical Cargos Privacy Policy",
     description: "Our privacy policy guidelines and data protection commitments.",
   },
   "/terms": {
-    title: "PrimeLogisticsFlow - Terms and Conditions",
-    keywords: "PrimeLogisticsFlow Terms and Conditions",
-    description: "Terms and conditions for using PrimeLogisticsFlow services.",
+    title: "Global Tropical Cargos - Terms and Conditions",
+    keywords: "Global Tropical Cargos Terms and Conditions",
+    description: "Terms and conditions for using Global Tropical Cargos services.",
   },
 };

@@ -26,7 +26,7 @@ export default function Hero() {
               <br /> <span className="accent2">Freight</span> Solutions
             </h1>
             <p className="hero-subtitle fade-up delay-2">
-              From ocean freight to last-mile delivery, customs clearance to supply chain management — PrimeLogisticsFlow offers a full suite of services engineered to move your cargo across borders with
+              From ocean freight to last-mile delivery, customs clearance to supply chain management — Global Tropical Cargos offers a full suite of services engineered to move your cargo across borders with
               speed, safety and precision.
             </p>
             <div className="hero-chips fade-up delay-3">

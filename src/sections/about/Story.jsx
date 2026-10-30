@@ -23,7 +23,7 @@ export default function Story() {
               <br /> Moving <span className="hl">the World</span>
             </h2>
             <p>
-              Founded in 2010 in Arizona, PrimeLogisticsFlow was born out of a simple but powerful
+              Founded in 2010 in Arizona, Global Tropical Cargos was born out of a simple but powerful
               conviction: every business — no matter its size — deserves reliable, transparent, and affordable
               freight solutions. Strategically headquartered in the heart of America's energy and trade
               capital, we were built to connect U.S. businesses to the world.

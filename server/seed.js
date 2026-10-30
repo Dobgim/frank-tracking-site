@@ -2,7 +2,7 @@ import { db } from "./db.js";
 import { hashPassword } from "./auth.js";
 import { CITIES, createShipment, updateShipment } from "./shipments.js";
 
-const EMAIL = process.env.ADMIN_EMAIL || "admin@primelogisticsflow.com";
+const EMAIL = process.env.ADMIN_EMAIL || "admin@globaltropicalcargos.com";
 const password = process.env.ADMIN_PASSWORD || "admin123";
 
 // Set default admin credentials

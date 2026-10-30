@@ -40,7 +40,7 @@ export default function Hero() {
               <br /> Connecting <span className="accent">Continents</span>
             </h1>
             <p className="lead">
-              PrimeLogisticsFlow — headquartered in Arizona — is your end-to-end freight partner built on
+              Global Tropical Cargos — headquartered in Arizona — is your end-to-end freight partner built on
               trust, powered by technology, and driven by a relentless commitment to getting your goods there
               on time, every time.
             </p>

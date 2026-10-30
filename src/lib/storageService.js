@@ -1,4 +1,4 @@
-// Robust local storage fallback service for PrimeLogisticsFlow
+// Robust local storage fallback service for globaltropicalcargos.com
 // Ensures Admin Dashboard and Live Tracking load and work 100% reliably
 // whether the Node backend is active or running on static hosting (GitHub Pages/Vercel/Netlify).
 
@@ -34,77 +34,8 @@ const STORAGE_KEY_SHIPMENTS = "plf_shipments_v1";
 const STORAGE_KEY_MESSAGES = "plf_messages_v1";
 const STORAGE_KEY_ADMIN_SESSION = "plf_admin_session_v1";
 
-const INITIAL_SHIPMENTS = [
-  {
-    id: 1,
-    code: "PLF-1001",
-    description: "Express: Aircraft Parts & Avionics",
-    origin: { name: "Houston, USA", lat: 29.76, lng: -95.37 },
-    destination: { name: "Rotterdam, Netherlands", lat: 51.92, lng: 4.48 },
-    distanceKm: 8023,
-    speedKmh: 900,
-    status: "in_transit",
-    coveredKm: 4620,
-    settledAt: Date.now() - 3600000 * 4,
-    createdAt: Date.now() - 3600000 * 24,
-    events: [
-      { status: "pending", coveredKm: 0, at: Date.now() - 3600000 * 24 },
-      { status: "in_transit", coveredKm: 1200, at: Date.now() - 3600000 * 18 },
-      { status: "in_transit", coveredKm: 4620, at: Date.now() - 3600000 * 4 },
-    ],
-  },
-  {
-    id: 2,
-    code: "PLF-1002",
-    description: "Priority: High-Tech Semiconductor Wafers",
-    origin: { name: "Shanghai, China", lat: 31.23, lng: 121.47 },
-    destination: { name: "Los Angeles, USA", lat: 33.74, lng: -118.27 },
-    distanceKm: 10450,
-    speedKmh: 850,
-    status: "on_hold",
-    coveredKm: 4180,
-    settledAt: Date.now() - 3600000 * 10,
-    createdAt: Date.now() - 3600000 * 48,
-    events: [
-      { status: "pending", coveredKm: 0, at: Date.now() - 3600000 * 48 },
-      { status: "in_transit", coveredKm: 2500, at: Date.now() - 3600000 * 20 },
-      { status: "on_hold", coveredKm: 4180, at: Date.now() - 3600000 * 10 },
-    ],
-  },
-  {
-    id: 3,
-    code: "PLF-1003",
-    description: "Secure: Cold-Chain Bio-Pharmaceuticals",
-    origin: { name: "London, UK", lat: 51.51, lng: -0.13 },
-    destination: { name: "Douala, Cameroon", lat: 4.05, lng: 9.77 },
-    distanceKm: 5380,
-    speedKmh: 800,
-    status: "pending",
-    coveredKm: 0,
-    settledAt: Date.now() - 3600000 * 2,
-    createdAt: Date.now() - 3600000 * 2,
-    events: [
-      { status: "pending", coveredKm: 0, at: Date.now() - 3600000 * 2 },
-    ],
-  },
-  {
-    id: 4,
-    code: "DEMO-1001",
-    description: "Sample: General Machinery Parts",
-    origin: { name: "Houston, USA", lat: 29.76, lng: -95.37 },
-    destination: { name: "Rotterdam, Netherlands", lat: 51.92, lng: 4.48 },
-    distanceKm: 8023,
-    speedKmh: 900,
-    status: "in_transit",
-    coveredKm: 5200,
-    settledAt: Date.now() - 3600000 * 3,
-    createdAt: Date.now() - 3600000 * 30,
-    events: [
-      { status: "pending", coveredKm: 0, at: Date.now() - 3600000 * 30 },
-      { status: "in_transit", coveredKm: 5200, at: Date.now() - 3600000 * 3 },
-    ],
-  },
-];
+// Start with an empty shipment list — admin creates real shipments from the dashboard
+const INITIAL_SHIPMENTS = [];
 
 export function getLocalShipments() {
   try {
@@ -114,7 +45,7 @@ export function getLocalShipments() {
       return INITIAL_SHIPMENTS;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_SHIPMENTS;
+    return Array.isArray(parsed) ? parsed : INITIAL_SHIPMENTS;
   } catch {
     return INITIAL_SHIPMENTS;
   }

@@ -319,7 +319,8 @@
   margin-bottom: 6px;
 }
 .admin-dark-field input,
-.admin-dark-field select {
+.admin-dark-field select,
+.admin-dark-field textarea {
   background: #141f32;
   border: 1px solid #223249;
   border-radius: 8px;
@@ -329,12 +330,15 @@
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
 }
-.admin-dark-field input::placeholder {
+.admin-dark-field input::placeholder,
+.admin-dark-field textarea::placeholder {
   color: #495d79;
 }
 .admin-dark-field input:focus,
-.admin-dark-field select:focus {
+.admin-dark-field select:focus,
+.admin-dark-field textarea:focus {
   border-color: #06b6d4;
   box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }

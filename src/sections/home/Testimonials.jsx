@@ -24,7 +24,7 @@ export default function Testimonials() {
                 <i className="bi bi-star-fill"></i>
               </div>
               <p className="testi-text">
-                PrimeLogisticsFlow has been our go-to freight partner for two years. Their real-time
+                Global Tropical Cargos has been our go-to freight partner for two years. Their real-time
                 tracking portal and responsive team make cross-border shipping effortless. Highly recommend!
               </p>
               <div className="testi-author">
@@ -48,7 +48,7 @@ export default function Testimonials() {
                 <i className="bi bi-star-fill"></i>
               </div>
               <p className="testi-text">
-                We rely on PrimeLogisticsFlow for time-sensitive medical equipment shipments across the US
+                We rely on Global Tropical Cargos for time-sensitive medical equipment shipments across the US
                 and internationally. They have never missed a deadline. Outstanding reliability and
                 professionalism.
               </p>
@@ -73,7 +73,7 @@ export default function Testimonials() {
                 <i className="bi bi-star-half"></i>
               </div>
               <p className="testi-text">
-                Switched to PrimeLogisticsFlow for our ocean freight imports from Asia and the difference
+                Switched to Global Tropical Cargos for our ocean freight imports from Asia and the difference
                 has been night and day — competitive rates, clean documentation, zero customs delays.
               </p>
               <div className="testi-author">
