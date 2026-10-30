@@ -1,5 +1,5 @@
 {
-  "name": "demo-freight-co",
+  "name": "primelogisticsflow",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -13,7 +13,6 @@
     "aos": "2.3.4",
     "bootstrap": "5.3.3",
     "express": "^5.3.0",
-    "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.0"

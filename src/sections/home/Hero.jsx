@@ -23,7 +23,7 @@ export default function Hero() {
               Every Horizon
             </h1>
             <p className="hero-subtitle fade-up delay-2">
-              Demo Freight Co. delivers world-class freight, shipping and supply chain solutions across
+              PrimeLogisticsFlow delivers world-class freight, shipping and supply chain solutions across
               North America, Europe, Asia and beyond — with precision and speed.
             </p>
             <div className="hero-address fade-up delay-2">

@@ -270,7 +270,7 @@ export default function ContactMain() {
           <div className="col-lg-4 reveal">
             <div className="location-panel">
               <div className="location-panel__info">
-                <div className="location-panel__title">Demo Freight Co.</div>
+                <div className="location-panel__title">PrimeLogisticsFlow</div>
                 <div className="loc-row">
                   <i className="fas fa-location-dot"></i>
                   <div className="loc-row__text">

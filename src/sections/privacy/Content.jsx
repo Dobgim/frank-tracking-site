@@ -5,7 +5,7 @@ export default function Content() {
       style={{ textAlign: "justify", lineHeight: "1.8" }}
     >
       <p>
-        Our Privacy Policy at Demo Freight Co. is designed to protect your personal information that we
+        Our Privacy Policy at PrimeLogisticsFlow is designed to protect your personal information that we
         collect through our website. We respect your privacy and are committed to securing your information.
         By using our services, you agree to the collection and use of your personal information in accordance
         with this policy.
@@ -16,7 +16,7 @@ export default function Content() {
         obtain feedback to improve our services.
       </p>
       <p>
-        At Demo Freight Co., we do not share your personal information with third parties, except where
+        At PrimeLogisticsFlow, we do not share your personal information with third parties, except where
         required by law. We take all necessary measures to ensure the safety and security of your personal
         information.
       </p>

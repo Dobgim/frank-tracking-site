@@ -35,7 +35,7 @@ export default function Layout() {
   return (
     <>
       <div className="demo-banner" role="note">
-        Demo site with sample data. Demo Freight Co. is not a real company.
+        PrimeLogisticsFlow Global Cargo &amp; Freight Portal · Real-time Tracking &amp; Fleet Operations
       </div>
       <Header key={`header-${pathname}`} />
       <Outlet />

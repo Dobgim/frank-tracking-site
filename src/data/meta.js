@@ -1,42 +1,42 @@
 export const META = {
   "/": {
-    title: "Demo Freight Co. - Home",
-    keywords: "Demo Freight Co.",
+    title: "PrimeLogisticsFlow - Global Freight & Cargo Solutions",
+    keywords: "PrimeLogisticsFlow, prime logistics flow, freight forwarding, cargo tracking, global shipping",
     description:
-      "Welcome to Demo Freight Co.! We are dedicated to providing exceptional shipping and logistics services to our customers.",
+      "Welcome to PrimeLogisticsFlow! We deliver exceptional shipping, air, ocean, and ground logistics services with real-time tracking.",
   },
   "/services": {
-    title: "Demo Freight Co. - Services",
-    keywords: "Demo Freight Co.",
+    title: "PrimeLogisticsFlow - Freight & Logistics Services",
+    keywords: "PrimeLogisticsFlow, logistics services, ocean freight, air freight, warehousing",
     description:
-      "We specialize in providing a wide range of express shipping services, including air, sea, and land transportation.",
+      "Explore PrimeLogisticsFlow express shipping services, including international air cargo, ocean shipping, road freight, and customs clearance.",
   },
   "/about-us": {
-    title: "Demo Freight Co. - About",
-    keywords: "About Demo Freight Co.",
+    title: "PrimeLogisticsFlow - About Us",
+    keywords: "About PrimeLogisticsFlow, global freight company",
     description:
-      "Our state-of-the-art technology and tracking systems ensure that you can easily monitor your shipment at every step of the journey.",
+      "Learn about PrimeLogisticsFlow, our global network across 85+ countries, and our state-of-the-art cargo tracking systems.",
   },
   "/contact": {
-    title: "Demo Freight Co. - Contact",
-    keywords: "Contact Demo Freight Co.",
+    title: "PrimeLogisticsFlow - Contact Us",
+    keywords: "Contact PrimeLogisticsFlow, freight quote, shipping support",
     description:
-      "Let us help you. For more information about the Demo Freight Co. services available from please contact us now.",
+      "Get in touch with PrimeLogisticsFlow. Request a free shipping quote or speak with our global logistics experts today.",
   },
   "/track-and-trace": {
-    title: "Demo Freight Co. - Track and Trace",
-    keywords: "Track and Trace",
+    title: "PrimeLogisticsFlow - Live Track & Trace",
+    keywords: "Track and Trace, PrimeLogisticsFlow tracking, live shipment tracking",
     description:
-      "Demo Freight Co. is a leading company with years of experience in the logistics industry.",
+      "Track your cargo in real time with PrimeLogisticsFlow interactive live GPS route and status monitoring.",
   },
   "/privacy": {
-    title: "Demo Freight Co. - Privacy Policy",
-    keywords: "Privacy Policy",
-    description: "Our privacy policy guidelines",
+    title: "PrimeLogisticsFlow - Privacy Policy",
+    keywords: "PrimeLogisticsFlow Privacy Policy",
+    description: "Our privacy policy guidelines and data protection commitments.",
   },
   "/terms": {
-    title: "Demo Freight Co. - Terms and Conditions",
-    keywords: "Terms and Conditions",
-    description: "Our Terms and Conditions",
+    title: "PrimeLogisticsFlow - Terms and Conditions",
+    keywords: "PrimeLogisticsFlow Terms and Conditions",
+    description: "Terms and conditions for using PrimeLogisticsFlow services.",
   },
 };

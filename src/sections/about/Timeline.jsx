@@ -33,7 +33,7 @@ export default function Timeline() {
                 <div className="tl-year">2010</div>
                 <h5>Foundation</h5>
                 <p>
-                  Demo Freight Co. founded in Arizona with a dedicated fleet and a mission to provide
+                  PrimeLogisticsFlow founded in Arizona with a dedicated fleet and a mission to provide
                   reliable freight solutions across the Gulf Coast and beyond.
                 </p>
               </div>

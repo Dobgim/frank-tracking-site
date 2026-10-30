@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import { Fragment, useEffect, useState } from "react";
 
 const TICKER_MESSAGES = [
-  { icon: "ship", text: "Real-time cargo tracking across 50+ countries" },
-  { icon: "globe", text: "Demo Freight Co. – Your trusted freight partner" },
+  { icon: "ship", text: "Real-time cargo tracking across 85+ countries" },
+  { icon: "globe", text: "PrimeLogisticsFlow – Your trusted freight & cargo partner" },
   { icon: "box", text: "Air, Sea & Road Freight Solutions" },
-  { icon: "bolt", text: "Express delivery now available" },
+  { icon: "bolt", text: "Express delivery & live GPS tracking now active" },
 ];
 
 function TickerMessages() {
@@ -37,7 +37,7 @@ export default function Header() {
               <i className="bi bi-telephone-fill" style={{ color: "var(--green)" }}></i>{" "}
               <a href="tel:+15550100100">+1 (555) 010-0100</a> <span className="divider">|</span>{" "}
               <i className="bi bi-envelope-fill" style={{ color: "var(--green)" }}></i>{" "}
-              <a href="mailto:demo@example.com">demo@example.com</a>
+              <a href="mailto:support@primelogisticsflow.com">support@primelogisticsflow.com</a>
             </div>
             <div className="d-none d-lg-flex align-items-center gap-3">
               <span>
@@ -46,6 +46,10 @@ export default function Header() {
               <span className="divider">|</span>{" "}
               <Link to="/track-and-trace">
                 <i className="bi bi-radar"></i> Track Shipment
+              </Link>
+              <span className="divider">|</span>{" "}
+              <Link to="/admin" style={{ color: "var(--orange)", fontWeight: 600 }}>
+                <i className="bi bi-shield-lock-fill"></i> Admin
               </Link>
               <div className="d-flex gap-2 ms-2">
                 <a href="#" aria-label="LinkedIn">
@@ -75,14 +79,22 @@ export default function Header() {
       >
         <div className="container">
           {" "}
-          <Link className="navbar-brand" to="/">
+          <Link className="navbar-brand d-flex align-items-center gap-2 py-2" to="/">
             {" "}
             <img
               src="/assets/logo/logo.svg"
-              alt="Demo Freight Co. Logo"
+              alt="PrimeLogisticsFlow Logo"
               className="logo-img"
-              style={{ height: "100px", width: "100px" }}
+              style={{ height: "54px", width: "54px", objectFit: "contain" }}
             />{" "}
+            <div className="d-flex flex-column text-start">
+              <span style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", letterSpacing: "0.5px", lineHeight: "1.1" }}>
+                Prime<span style={{ color: "var(--green)" }}>Logistics</span><span style={{ color: "var(--orange)" }}>Flow</span>
+              </span>
+              <span style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.72)", letterSpacing: "1.2px", textTransform: "uppercase", fontWeight: 600 }}>
+                Global Freight &amp; Cargo
+              </span>
+            </div>
           </Link>{" "}
           <button
             className="navbar-toggler"
@@ -118,6 +130,11 @@ export default function Header() {
               <li className="nav-item">
                 <Link className="nav-link-custom" to="/contact">
                   Contact
+                </Link>
+              </li>
+              <li className="nav-item d-lg-none">
+                <Link className="nav-link-custom" to="/admin" style={{ color: "var(--orange)" }}>
+                  Admin Dashboard
                 </Link>
               </li>
             </ul>{" "}

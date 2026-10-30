@@ -53,14 +53,15 @@ export default function Footer() {
                 {" "}
                 <img
                   src="/assets/logo/logo.svg"
-                  alt="Demo Freight Co."
+                  alt="PrimeLogisticsFlow"
                   className="footer-logo-img"
+                  style={{ height: "64px", width: "64px" }}
                 />{" "}
               </Link>
               <div className="footer-brand-name">
-                Demo <span>Freight</span>
+                Prime<span>Logistics</span><span style={{ color: "var(--orange)" }}>Flow</span>
               </div>
-              <span className="footer-tagline">Cargo</span>
+              <span className="footer-tagline">Global Freight &amp; Cargo Solutions</span>
               <p className="footer-desc">
                 A trusted partner in global freight forwarding, warehousing, and end-to-end supply chain
                 management. From local docks to every corner of the world.
@@ -232,13 +233,14 @@ export default function Footer() {
               <div className="col-md-6">
                 <p className="copyright mb-0">
                   © <span id="year">{new Date().getFullYear()}</span>{" "}
-                  <Link to="/">Demo Freight Co.</Link>. All rights reserved.
+                  <Link to="/">PrimeLogisticsFlow</Link>. All rights reserved.
                 </p>
               </div>
               <div className="col-md-6">
                 <nav className="legal-links" aria-label="Legal links">
                   <Link to="/privacy">Privacy Policy</Link> <Link to="/terms">Terms of Use</Link>{" "}
-                  <Link to="/contact">Support</Link>
+                  <Link to="/contact">Support</Link>{" "}
+                  <Link to="/admin" style={{ color: "var(--orange)", fontWeight: "600" }}>Admin Dashboard</Link>
                 </nav>
               </div>
             </div>

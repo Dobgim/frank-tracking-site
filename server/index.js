@@ -115,4 +115,4 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Something went wrong." });
 });
 
-app.listen(PORT, "127.0.0.1", () => console.log(`Demo server running on http://localhost:${PORT}`));
+app.listen(PORT, "127.0.0.1", () => console.log(`PrimeLogisticsFlow server running on http://localhost:${PORT}`));

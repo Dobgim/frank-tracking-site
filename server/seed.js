@@ -1,20 +1,20 @@
-import { randomBytes } from "node:crypto";
 import { db } from "./db.js";
 import { hashPassword } from "./auth.js";
 import { CITIES, createShipment, updateShipment } from "./shipments.js";
 
-const EMAIL = "admin@demofreight.test";
-const password = randomBytes(9).toString("base64url");
+const EMAIL = process.env.ADMIN_EMAIL || "admin@primelogisticsflow.com";
+const password = process.env.ADMIN_PASSWORD || "admin123";
 
-// Running this again replaces the admin password.
+// Set default admin credentials
 db.prepare("DELETE FROM admins").run();
 db.prepare("INSERT INTO admins (email, password_hash) VALUES (?, ?)").run(EMAIL, hashPassword(password));
 
 const city = (name) => CITIES.find((c) => c.name.startsWith(name));
 const samples = [
-  { code: "DEMO-1001", description: "Sample: machine parts", from: "Houston", to: "Rotterdam", status: "in_transit" },
-  { code: "DEMO-1002", description: "Sample: textiles", from: "Shanghai", to: "Los Angeles", status: "on_hold" },
-  { code: "DEMO-1003", description: "Sample: medical supplies", from: "London", to: "Douala", status: "pending" },
+  { code: "PLF-1001", description: "Express: Aircraft Parts & Avionics", from: "Houston", to: "Rotterdam", status: "in_transit" },
+  { code: "PLF-1002", description: "Priority: High-Tech Electronics", from: "Shanghai", to: "Los Angeles", status: "on_hold" },
+  { code: "PLF-1003", description: "Secure: Cold-Chain Medical Supplies", from: "London", to: "Douala", status: "pending" },
+  { code: "DEMO-1001", description: "Sample: General Machinery Parts", from: "Houston", to: "Rotterdam", status: "in_transit" },
 ];
 
 for (const sample of samples) {

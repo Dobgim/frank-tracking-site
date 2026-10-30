@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { routePoints } from "../../lib/geo";
+import { loadGoogleMaps } from "../../lib/googleMaps";
+import { pointAlong, routePoints } from "../../lib/geo";
 
 const POLL_MS = 5000;
 const LABELS = { pending: "Pending", in_transit: "In transit", on_hold: "On hold", delivered: "Delivered" };
+const PACKAGE_ICON = `data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><circle cx="17" cy="17" r="15.500" fill="#0A3D62" stroke="#fff" stroke-width="2"/><path fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round" d="M17 9l7 3.500v9L17 25l-7-3.500v-9zM10 12.500l7 3.500 7-3.500M17 16v9"/></svg>`,
+)}`;
+
+const toLatLng = ([lat, lng]) => ({ lat, lng });
 
 function ShipmentMap({ shipment }) {
   const element = useRef(null);
-  const map = useRef(null);
   const latest = useRef(shipment);
   latest.current = shipment;
   const synced = useRef({ covered: shipment.coveredKm, at: performance.now() });
+  const [error, setError] = useState(null);
 
   // A new server reading corrects the estimate but can never move the marker back.
   useEffect(() => {
@@ -19,54 +23,94 @@ function ShipmentMap({ shipment }) {
   }, [shipment]);
 
   useEffect(() => {
-    const { origin, destination } = latest.current;
-    const instance = L.map(element.current, { worldCopyJump: true });
-    map.current = instance;
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(instance);
-
-    const route = routePoints(origin, destination);
-    L.polyline(route, { color: "#7F8C8D", weight: 2, dashArray: "6 6" }).addTo(instance);
-    const travelled = L.polyline([], { color: "#1ABC9C", weight: 4 }).addTo(instance);
-    L.circleMarker([origin.lat, origin.lng], { radius: 6, color: "#0A3D62" }).addTo(instance).bindTooltip(origin.name);
-    L.circleMarker(route[route.length - 1], { radius: 6, color: "#F39C12" })
-      .addTo(instance)
-      .bindTooltip(destination.name);
-    const marker = L.marker([origin.lat, origin.lng], {
-      icon: L.divIcon({
-        className: "track-marker",
-        html: '<i class="bi bi-box-seam"></i>',
-        iconSize: [34, 34],
-        iconAnchor: [17, 17],
-      }),
-    }).addTo(instance);
-    instance.fitBounds(L.polyline(route).getBounds(), { padding: [40, 40] });
-
     let frame;
-    const draw = () => {
-      const s = latest.current;
-      const elapsedHours = (performance.now() - synced.current.at) / 3_600_000;
-      const estimate = synced.current.covered + (s.status === "in_transit" ? elapsedHours * s.speedKmh : 0);
-      const shown = Math.min(s.distanceKm, Math.max(estimate, synced.current.shown ?? 0));
-      synced.current.shown = shown;
-      const fraction = s.distanceKm ? shown / s.distanceKm : 1;
-      const points = routePoints(origin, destination, 0, fraction);
-      marker.setLatLng(points[points.length - 1]);
-      travelled.setLatLngs(points);
-      frame = requestAnimationFrame(draw);
-    };
-    draw();
+    let cancelled = false;
+
+    loadGoogleMaps()
+      .then((maps) => {
+        if (cancelled) return;
+        const { origin, destination } = latest.current;
+        const map = new maps.Map(element.current, { mapTypeControl: false, streetViewControl: false });
+        const route = routePoints(origin, destination).map(toLatLng);
+
+        new maps.Polyline({
+          map,
+          path: route,
+          strokeOpacity: 0,
+          icons: [
+            {
+              icon: { path: "M 0,-1 0,1", strokeColor: "#7F8C8D", strokeOpacity: 1, scale: 2 },
+              offset: "0",
+              repeat: "12px",
+            },
+          ],
+        });
+        const travelled = new maps.Polyline({ map, strokeColor: "#1ABC9C", strokeWeight: 4 });
+
+        const stop = (place, color) =>
+          new maps.Marker({
+            map,
+            position: { lat: place.lat, lng: place.lng },
+            title: place.name,
+            icon: {
+              path: maps.SymbolPath.CIRCLE,
+              scale: 6,
+              fillColor: "#fff",
+              fillOpacity: 1,
+              strokeColor: color,
+              strokeWeight: 3,
+            },
+          });
+        stop(origin, "#0A3D62");
+        stop(destination, "#F39C12");
+
+        const marker = new maps.Marker({
+          map,
+          title: latest.current.code,
+          zIndex: 10,
+          icon: {
+            url: PACKAGE_ICON,
+            scaledSize: new maps.Size(34, 34),
+            anchor: new maps.Point(17, 17),
+          },
+        });
+
+        const bounds = new maps.LatLngBounds();
+        route.forEach((point) => bounds.extend(point));
+        map.fitBounds(bounds, 40);
+
+        let drawn = -1;
+        const draw = () => {
+          const s = latest.current;
+          const elapsedHours = (performance.now() - synced.current.at) / 3_600_000;
+          const estimate = synced.current.covered + (s.status === "in_transit" ? elapsedHours * s.speedKmh : 0);
+          const shown = Math.min(s.distanceKm, Math.max(estimate, synced.current.shown ?? 0));
+          synced.current.shown = shown;
+          if (shown !== drawn) {
+            drawn = shown;
+            const fraction = s.distanceKm ? shown / s.distanceKm : 1;
+            marker.setPosition(toLatLng(pointAlong(origin, destination, fraction)));
+            travelled.setPath(routePoints(origin, destination, 0, fraction).map(toLatLng));
+          }
+          frame = requestAnimationFrame(draw);
+        };
+        draw();
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      });
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frame);
-      instance.remove();
     };
   }, []);
 
+  if (error) return <p className="track-error">{error}</p>;
   return <div className="track-map" ref={element} />;
 }
+
+import { findLocalShipmentByCode } from "../../lib/storageService";
 
 export default function TrackResult({ code }) {
   const [shipment, setShipment] = useState(null);
@@ -76,10 +120,15 @@ export default function TrackResult({ code }) {
     let active = true;
     const load = async () => {
       try {
-        const response = await fetch(`/api/track/${encodeURIComponent(code)}`);
+        const response = await fetch(`/api/track/${encodeURIComponent(code)}`, {
+          signal: AbortSignal.timeout(4000),
+        });
         const data = await response.json();
         if (!active) return;
         if (!response.ok) {
+          // Backend returned error — try local storage before showing error
+          const local = findLocalShipmentByCode(code);
+          if (local) { setError(null); setShipment(local); return; }
           setShipment(null);
           setError(data.error);
           return;
@@ -87,7 +136,15 @@ export default function TrackResult({ code }) {
         setError(null);
         setShipment(data);
       } catch {
-        if (active) setError("Could not reach the tracking server.");
+        if (!active) return;
+        // Network error — fall back to local storage
+        const local = findLocalShipmentByCode(code);
+        if (local) {
+          setError(null);
+          setShipment(local);
+        } else {
+          setError("No shipment found with that tracking code.");
+        }
       }
     };
     setShipment(null);
