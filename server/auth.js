@@ -51,7 +51,7 @@ export function login(req, res) {
     admin.id,
     Date.now() + SESSION_MS,
   );
-  res.cookie(COOKIE, token, { httpOnly: true, sameSite: "strict", maxAge: SESSION_MS });
+  res.cookie(COOKIE, token, { httpOnly: true, sameSite: "lax", path: "/", maxAge: SESSION_MS });
   res.json({ email: admin.email });
 }
 

@@ -183,7 +183,7 @@ export default function Footer() {
                 <div>
                   <div className="contact-label">Email</div>
                   <div className="contact-value">
-                    <a href="mailto:demo@example.com">demo@example.com</a>
+                    <a href="mailto:support@primelogisticsflow.com">support@primelogisticsflow.com</a>
                   </div>
                 </div>
               </div>
@@ -239,8 +239,7 @@ export default function Footer() {
               <div className="col-md-6">
                 <nav className="legal-links" aria-label="Legal links">
                   <Link to="/privacy">Privacy Policy</Link> <Link to="/terms">Terms of Use</Link>{" "}
-                  <Link to="/contact">Support</Link>{" "}
-                  <Link to="/admin" style={{ color: "var(--orange)", fontWeight: "600" }}>Admin Dashboard</Link>
+                  <Link to="/contact">Support</Link>
                 </nav>
               </div>
             </div>

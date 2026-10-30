@@ -47,10 +47,6 @@ export default function Header() {
               <Link to="/track-and-trace">
                 <i className="bi bi-radar"></i> Track Shipment
               </Link>
-              <span className="divider">|</span>{" "}
-              <Link to="/admin" style={{ color: "var(--orange)", fontWeight: 600 }}>
-                <i className="bi bi-shield-lock-fill"></i> Admin
-              </Link>
               <div className="d-flex gap-2 ms-2">
                 <a href="#" aria-label="LinkedIn">
                   <i className="bi bi-linkedin"></i>
@@ -130,11 +126,6 @@ export default function Header() {
               <li className="nav-item">
                 <Link className="nav-link-custom" to="/contact">
                   Contact
-                </Link>
-              </li>
-              <li className="nav-item d-lg-none">
-                <Link className="nav-link-custom" to="/admin" style={{ color: "var(--orange)" }}>
-                  Admin Dashboard
                 </Link>
               </li>
             </ul>{" "}

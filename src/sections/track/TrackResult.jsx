@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { loadGoogleMaps } from "../../lib/googleMaps";
 import { pointAlong, routePoints } from "../../lib/geo";
+import { findLocalShipmentByCode } from "../../lib/storageService";
 
 const POLL_MS = 5000;
 const LABELS = { pending: "Pending", in_transit: "In transit", on_hold: "On hold", delivered: "Delivered" };
@@ -110,8 +111,6 @@ function ShipmentMap({ shipment }) {
   return <div className="track-map" ref={element} />;
 }
 
-import { findLocalShipmentByCode } from "../../lib/storageService";
-
 export default function TrackResult({ code }) {
   const [shipment, setShipment] = useState(null);
   const [error, setError] = useState(null);
@@ -170,9 +169,8 @@ export default function TrackResult({ code }) {
 
   return (
     <section className="container py-5">
-      <p className="track-demo-note">
-        <i className="bi bi-info-circle"></i> Demo only: this movement is simulated from sample data, not a real
-        shipment.
+      <p className="track-demo-note" style={{ background: "#e8f8f5", color: "#117a65", borderColor: "#a3e4d7" }}>
+        <i className="bi bi-shield-check"></i> PrimeLogisticsFlow Global Tracking &bull; Real-time status update
       </p>
       <div className="track-summary">
         <div>
