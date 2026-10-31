@@ -53,13 +53,13 @@ export default function Footer() {
                 {" "}
                 <img
                   src="/assets/logo/logo.svg"
-                  alt="PrimeLogisticsFlow"
+                  alt="Global Tropical Cargos"
                   className="footer-logo-img"
                   style={{ height: "64px", width: "64px" }}
                 />{" "}
               </Link>
               <div className="footer-brand-name">
-                Prime<span>Logistics</span><span style={{ color: "var(--orange)" }}>Flow</span>
+                Global<span>Tropical</span><span style={{ color: "var(--orange)" }}>Cargos</span>
               </div>
               <span className="footer-tagline">Global Freight &amp; Cargo Solutions</span>
               <p className="footer-desc">
@@ -183,7 +183,7 @@ export default function Footer() {
                 <div>
                   <div className="contact-label">Email</div>
                   <div className="contact-value">
-                    <a href="mailto:support@primelogisticsflow.com">support@primelogisticsflow.com</a>
+                    <a href="mailto:support@globaltropicalcargos.com">support@globaltropicalcargos.com</a>
                   </div>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export default function Footer() {
               <div className="col-md-6">
                 <p className="copyright mb-0">
                   © <span id="year">{new Date().getFullYear()}</span>{" "}
-                  <Link to="/">PrimeLogisticsFlow</Link>. All rights reserved.
+                  <Link to="/">Global Tropical Cargos</Link>. All rights reserved.
                 </p>
               </div>
               <div className="col-md-6">

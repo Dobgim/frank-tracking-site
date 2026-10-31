@@ -35,7 +35,7 @@ export default function Layout() {
   return (
     <>
       <div className="demo-banner" role="note">
-        PrimeLogisticsFlow Global Cargo &amp; Freight Portal · Real-time Tracking &amp; Fleet Operations
+        Global Tropical Cargos · Global Cargo &amp; Freight Portal · Real-time Tracking &amp; Fleet Operations
       </div>
       <Header key={`header-${pathname}`} />
       <Outlet />
