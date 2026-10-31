@@ -1,5 +1,5 @@
 // GET /api/admin/me — check if current session is valid
-import { getDb, ensureSchema, json, setCors } from "../../_db.js";
+import { getDb, ensureSchema, json, setCors } from "../_db.js";
 import { requireAdmin } from "./_guard.js";
 
 export default async function handler(req, res) {

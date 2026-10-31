@@ -1,6 +1,6 @@
 // Shared admin auth guard — supports Bearer token, x-admin-token, or cookie
-import { json, parseCookie } from "../../_db.js";
-import { tokenHash } from "../../auth-helper.js";
+import { json, parseCookie } from "../_db.js";
+import { tokenHash } from "../auth-helper.js";
 
 export async function requireAdmin(req, res, sql) {
   const authHeader = req.headers.authorization || "";

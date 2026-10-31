@@ -1,6 +1,6 @@
 // POST /api/admin/logout
-import { getDb, json, setCors, parseCookie, clearCookie } from "../../_db.js";
-import { tokenHash } from "../../auth-helper.js";
+import { getDb, json, setCors, parseCookie, clearCookie } from "../_db.js";
+import { tokenHash } from "../auth-helper.js";
 
 export default async function handler(req, res) {
   setCors(res);

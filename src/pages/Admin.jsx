@@ -813,9 +813,8 @@ function Dashboard({ admin, onLogout }) {
   const refresh = useCallback(async () => {
     const [shipRes, msgRes] = await Promise.all([tryApi("/shipments"), tryApi("/messages")]);
 
-    if (shipRes.ok && msgRes.ok) {
+    if (shipRes.ok) {
       setShipments(shipRes.data);
-      setMessages(msgRes.data);
       setOffline(false);
 
       // Auto-sync any local shipments created earlier while offline to Neon Postgres
@@ -860,16 +859,19 @@ function Dashboard({ admin, onLogout }) {
           }
         }
       }
-    } else if (shipRes.offline || msgRes.offline) {
-      setShipments(getLocalShipments());
-      setMessages(getLocalMessages());
-      setOffline(true);
-    } else if (shipRes.status === 401 || msgRes.status === 401) {
-      onLogout();
     } else {
-      setShipments(getLocalShipments());
+      if (shipRes.status === 401) {
+        onLogout();
+      } else {
+        setShipments(getLocalShipments());
+        setOffline(true);
+      }
+    }
+
+    if (msgRes.ok) {
+      setMessages(msgRes.data);
+    } else {
       setMessages(getLocalMessages());
-      setOffline(true);
     }
   }, [onLogout]);
 

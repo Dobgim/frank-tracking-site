@@ -1,6 +1,6 @@
 // POST /api/admin/login
-import { getDb, ensureSchema, json, setCors, setCookie, readBody } from "../../_db.js";
-import { verifyPassword, tokenHash } from "../../auth-helper.js";
+import { getDb, ensureSchema, json, setCors, setCookie, readBody } from "../_db.js";
+import { verifyPassword, tokenHash } from "../auth-helper.js";
 import { randomBytes } from "node:crypto";
 
 const SESSION_MS = 30 * 24 * 3_600_000; // 30 days so admin never gets randomly logged out

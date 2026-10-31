@@ -1,5 +1,5 @@
 // POST /api/messages — public contact form message storage
-import { getDb, ensureSchema, json, setCors, readBody } from "../_db.js";
+import { getDb, ensureSchema, json, setCors, readBody } from "./_db.js";
 
 export default async function handler(req, res) {
   setCors(res);
